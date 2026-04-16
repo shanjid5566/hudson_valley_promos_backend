@@ -50,12 +50,12 @@ class UserService {
       });
 
       if (!user) {
-        throw new Error('Invalid email or password');
+        throw new Error('Email not found');
       }
 
       const isPasswordValid = await bcrypt.compare(password, user.password);
       if (!isPasswordValid) {
-        throw new Error('Invalid email or password');
+        throw new Error('Password does not match');
       }
 
       if (!user.isEmailVerified) {

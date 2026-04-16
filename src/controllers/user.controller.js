@@ -42,7 +42,8 @@ class UserController {
     } catch (error) {
       const message = error.message || '';
       const statusCode =
-        message.includes('Invalid email or password') ? 401 :
+        message.includes('Email not found') ? 404 :
+        message.includes('Password does not match') ? 401 :
         message.includes('verify your email') ? 403 : 400;
 
       res.status(statusCode).json({
