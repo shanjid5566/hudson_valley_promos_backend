@@ -4,8 +4,8 @@
 // Get a free hosted Postgres database in seconds: `npx create-db`
 
 generator client {
-  provider = "prisma-client"
-  output   = "../../src/generated/prisma"
+  provider = "prisma-client-js"
+  engineType = "binary"
 }
 
 datasource db {
@@ -22,24 +22,38 @@ enum Role {
 }
 
 model User {
-  id        String   @id @default(uuid())
-  email     String   @unique
-  password  String
-  firstName String?
-  lastName  String?
-  phone     String?
-  role      Role     @default(CUSTOMER)
-  avatarUrl String?
+  id              String   @id @default(uuid())
+  email           String   @unique
+  password        String
+  firstName       String?
+  lastName        String?
+  phone           String?
+  role            Role     @default(CUSTOMER)
+  avatarUrl       String?
+  isEmailVerified Boolean  @default(false)
 
-  addresses Address[]
-  orders    Order[]
-  reviews   Review[]
-  cart      Cart?
+  addresses       Address[]
+  orders          Order[]
+  reviews         Review[]
+  cart            Cart?
+  otpVerification OTPVerification?
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
 
   @@index([email])
+}
+
+model OTPVerification {
+  id        String   @id @default(uuid())
+  userId    String   @unique
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  otp       String
+  expiresAt DateTime
+  attempts  Int      @default(0)
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 enum AddressType {
@@ -195,8 +209,7 @@ model CartItem {
 enum OrderStatus {
   PENDING
   PROCESSING
-  SHIPPED
-  DELIVERED
+  COMPLETED
   CANCELLED
 }
 

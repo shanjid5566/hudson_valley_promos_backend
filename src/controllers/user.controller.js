@@ -6,6 +6,53 @@ const userService = require('../services/user.service');
  */
 class UserController {
   /**
+   * Login with email and password
+   * @route POST /api/users/auth/login
+   * @body {Object} - { email, password }
+   */
+  async login(req, res, next) {
+    try {
+      const { email, password } = req.body;
+
+      if (!email || !password) {
+        return res.status(400).json({
+          success: false,
+          error: 'Email and password are required'
+        });
+      }
+
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(email)) {
+        return res.status(400).json({
+          success: false,
+          error: 'Invalid email format'
+        });
+      }
+
+      const result = await userService.loginUser({ email, password });
+
+      res.status(200).json({
+        success: true,
+        message: result.message,
+        data: {
+          token: result.token,
+          user: result.user
+        }
+      });
+    } catch (error) {
+      const message = error.message || '';
+      const statusCode =
+        message.includes('Invalid email or password') ? 401 :
+        message.includes('verify your email') ? 403 : 400;
+
+      res.status(statusCode).json({
+        success: false,
+        error: message
+      });
+    }
+  }
+
+  /**
    * Get all users
    * @route GET /api/users
    */
@@ -49,7 +96,142 @@ class UserController {
   }
 
   /**
-   * Create new user
+   * Register a new customer
+   * @route POST /api/users/auth/register
+   * @body {Object} - { email, password, firstName, lastName, phone }
+   */
+  async registerCustomer(req, res, next) {
+    try {
+      const { email, password, firstName, lastName, phone } = req.body;
+
+      // Validation
+      if (!email || !password || !firstName) {
+        return res.status(400).json({
+          success: false,
+          error: 'Email, password, and first name are required'
+        });
+      }
+
+      // Email validation
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(email)) {
+        return res.status(400).json({
+          success: false,
+          error: 'Invalid email format'
+        });
+      }
+
+      // Password validation (minimum 6 characters)
+      if (password.length < 6) {
+        return res.status(400).json({
+          success: false,
+          error: 'Password must be at least 6 characters long'
+        });
+      }
+
+      const result = await userService.registerCustomer({
+        email,
+        password,
+        firstName,
+        lastName,
+        phone
+      });
+
+      res.status(201).json({
+        success: true,
+        message: result.message,
+        data: {
+          email: result.email,
+          firstName: result.firstName,
+          lastName: result.lastName,
+          phone: result.phone
+        }
+      });
+    } catch (error) {
+      const statusCode = error.message.includes('already registered') ? 409 : 400;
+      res.status(statusCode).json({
+        success: false,
+        error: error.message
+      });
+    }
+  }
+
+  /**
+   * Verify OTP and activate email
+   * @route POST /api/users/auth/verify-otp
+   * @body {Object} - { email, otp }
+   */
+  async verifyOTP(req, res, next) {
+    try {
+      const { email, otp } = req.body;
+
+      // Validation
+      if (!email || !otp) {
+        return res.status(400).json({
+          success: false,
+          error: 'Email and OTP are required'
+        });
+      }
+
+      if (otp.length !== 5 || isNaN(otp)) {
+        return res.status(400).json({
+          success: false,
+          error: 'OTP must be a 5-digit number'
+        });
+      }
+
+      const result = await userService.verifyOTP(email, otp);
+
+      res.status(200).json({
+        success: true,
+        message: result.message,
+        data: {
+          email: result.email,
+          userId: result.userId
+        }
+      });
+    } catch (error) {
+      const statusCode = error.message.includes('Maximum OTP attempts') ? 429 : 400;
+      res.status(statusCode).json({
+        success: false,
+        error: error.message
+      });
+    }
+  }
+
+  /**
+   * Resend OTP to email
+   * @route POST /api/users/auth/resend-otp
+   * @body {Object} - { email }
+   */
+  async resendOTP(req, res, next) {
+    try {
+      const { email } = req.body;
+
+      if (!email) {
+        return res.status(400).json({
+          success: false,
+          error: 'Email is required'
+        });
+      }
+
+      const result = await userService.resendOTP(email);
+
+      res.status(200).json({
+        success: true,
+        message: result.message,
+        data: { email: result.email }
+      });
+    } catch (error) {
+      res.status(400).json({
+        success: false,
+        error: error.message
+      });
+    }
+  }
+
+  /**
+   * Create new user (General purpose)
    * @route POST /api/users
    */
   async createUser(req, res, next) {
