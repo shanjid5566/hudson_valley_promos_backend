@@ -20,9 +20,11 @@ app.get('/health', (req, res) => {
 
 // Import routes
 const userRoutes = require('./routes/user.routes');
+const adminRoutes = require('./routes/admin.routes');
 
 // Use routes
 app.use('/api/users', userRoutes);
+app.use('/api/admin', adminRoutes);
 
 // 404 handler - catch all undefined routes
 app.use((req, res) => {

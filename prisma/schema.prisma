@@ -83,32 +83,69 @@ model Address {
 }
 
 // ==========================================
-// Catalog (Categories & Products)
+// Catalog (Services, Categories & Products)
 // ==========================================
 
+model Service {
+  id          String       @id @default(uuid())
+  name        String       @unique
+  slug        String       @unique
+  description String?      @db.Text
+  icon        String?      // Icon URL or class name
+  
+  categories  Category[]   // Direct categories under this service
+
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  @@index([slug])
+}
+
 model Category {
-  id          String     @id @default(uuid())
+  id          String        @id @default(uuid())
+  serviceId   String
+  service     Service       @relation(fields: [serviceId], references: [id], onDelete: Cascade)
+  
   name        String
-  slug        String     @unique
+  slug        String        @unique
   description String?
-  parentId    String?    // Self-relation for Subcategories
-  parent      Category?  @relation("CategoryToSubcategory", fields: [parentId], references: [id])
-  children    Category[] @relation("CategoryToSubcategory")
+  
+  subcategories Subcategory[]
+  products    Product[]
+
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  @@index([serviceId])
+  @@index([slug])
+}
+
+model Subcategory {
+  id          String   @id @default(uuid())
+  categoryId  String
+  category    Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  
+  name        String
+  slug        String   @unique
+  description String?
   
   products    Product[]
 
-  createdAt   DateTime   @default(now())
-  updatedAt   DateTime   @updatedAt
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
-  @@index([parentId])
+  @@index([categoryId])
+  @@index([slug])
 }
 
 model Product {
-  id            String   @id @default(uuid())
-  categoryId    String
-  category      Category @relation(fields: [categoryId], references: [id])
+  id            String       @id @default(uuid())
+  categoryId    String?
+  category      Category?    @relation(fields: [categoryId], references: [id])
+  subcategoryId String?
+  subcategory   Subcategory? @relation(fields: [subcategoryId], references: [id])
   name          String
-  slug          String   @unique
+  slug          String       @unique
   description   String   @db.Text
   basePrice     Decimal  @db.Decimal(10, 2)
   images        String[] // Array of image URLs
