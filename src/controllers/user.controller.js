@@ -298,6 +298,138 @@ class UserController {
       next(error);
     }
   }
+
+  /**
+   * Send password reset OTP to email
+   * @route POST /api/users/auth/forgot-password
+   * @body {Object} - { email }
+   */
+  async forgotPassword(req, res, next) {
+    try {
+      const { email } = req.body;
+
+      if (!email) {
+        return res.status(400).json({
+          success: false,
+          error: 'Email is required'
+        });
+      }
+
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(email)) {
+        return res.status(400).json({
+          success: false,
+          error: 'Invalid email format'
+        });
+      }
+
+      const result = await userService.forgotPassword(email);
+
+      res.status(200).json({
+        success: true,
+        message: result.message,
+        data: {
+          email: result.email
+        }
+      });
+    } catch (error) {
+      const statusCode = error.message.includes('Email not found') ? 404 : 400;
+      res.status(statusCode).json({
+        success: false,
+        error: error.message
+      });
+    }
+  }
+
+  /**
+   * Verify password reset OTP
+   * @route POST /api/users/auth/verify-reset-otp
+   * @body {Object} - { email, otp }
+   */
+  async verifyResetOTP(req, res, next) {
+    try {
+      const { email, otp } = req.body;
+
+      if (!email || !otp) {
+        return res.status(400).json({
+          success: false,
+          error: 'Email and OTP are required'
+        });
+      }
+
+      if (otp.length !== 5 || isNaN(otp)) {
+        return res.status(400).json({
+          success: false,
+          error: 'OTP must be a 5-digit number'
+        });
+      }
+
+      const result = await userService.verifyResetOTP(email, otp);
+
+      res.status(200).json({
+        success: true,
+        message: result.message,
+        data: {
+          email: result.email,
+          userId: result.userId
+        }
+      });
+    } catch (error) {
+      const statusCode = error.message.includes('Maximum OTP attempts') ? 429 : 400;
+      res.status(statusCode).json({
+        success: false,
+        error: error.message
+      });
+    }
+  }
+
+  /**
+   * Reset password with verified OTP
+   * @route POST /api/users/auth/reset-password
+   * @body {Object} - { email, newPassword, confirmPassword }
+   */
+  async resetPassword(req, res, next) {
+    try {
+      const { email, newPassword, confirmPassword } = req.body;
+
+      if (!email || !newPassword || !confirmPassword) {
+        return res.status(400).json({
+          success: false,
+          error: 'Email, new password, and confirm password are required'
+        });
+      }
+
+      if (newPassword !== confirmPassword) {
+        return res.status(400).json({
+          success: false,
+          error: 'Passwords do not match'
+        });
+      }
+
+      if (newPassword.length < 8) {
+        return res.status(400).json({
+          success: false,
+          error: 'Password must be at least 8 characters long'
+        });
+      }
+
+      const result = await userService.resetPassword(email, newPassword);
+
+      res.status(200).json({
+        success: true,
+        message: result.message,
+        data: {
+          email: result.email
+        }
+      });
+    } catch (error) {
+      const statusCode = 400;
+      res.status(statusCode).json({
+        success: false,
+        error: error.message
+      });
+    }
+  }
 }
 
 module.exports = new UserController();

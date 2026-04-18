@@ -1,4 +1,4 @@
-{
+﻿{
   "info": {
     "_postman_id": "slimedoesgamez-api-collection",
     "name": "SlimeDoesGamez API Collection",
@@ -630,6 +630,444 @@
                 }
               ],
               "body": "{\n  \"success\": false,\n  \"error\": \"Please verify your email before login\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Forgot Password - Send OTP",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"john@example.com\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/users/auth/forgot-password",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "users",
+                "auth",
+                "forgot-password"
+              ]
+            },
+            "description": "Send password reset OTP to user's email. Email must be registered and verified."
+          },
+          "response": [
+            {
+              "name": "Success Response (200)",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"email\": \"john@example.com\"\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/users/auth/forgot-password",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "users",
+                    "auth",
+                    "forgot-password"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": true,\n  \"message\": \"Password reset code sent to your email.\",\n  \"data\": {\n    \"email\": \"john@example.com\"\n  }\n}"
+            },
+            {
+              "name": "Error - Email Not Found (404)",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"email\": \"nonexistent@example.com\"\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/users/auth/forgot-password",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "users",
+                    "auth",
+                    "forgot-password"
+                  ]
+                }
+              },
+              "status": "Not Found",
+              "code": 404,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": false,\n  \"error\": \"Email not found\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Verify Reset OTP",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"john@example.com\",\n  \"otp\": \"12345\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/users/auth/verify-reset-otp",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "users",
+                "auth",
+                "verify-reset-otp"
+              ]
+            },
+            "description": "Verify the 5-digit OTP code received for password reset."
+          },
+          "response": [
+            {
+              "name": "Success Response (200)",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"email\": \"john@example.com\",\n  \"otp\": \"12345\"\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/users/auth/verify-reset-otp",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "users",
+                    "auth",
+                    "verify-reset-otp"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": true,\n  \"message\": \"OTP verified successfully. You can now reset your password.\",\n  \"data\": {\n    \"email\": \"john@example.com\",\n    \"userId\": \"550e8400-e29b-41d4-a716-446655440000\"\n  }\n}"
+            },
+            {
+              "name": "Error - Invalid OTP (400)",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"email\": \"john@example.com\",\n  \"otp\": \"99999\"\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/users/auth/verify-reset-otp",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "users",
+                    "auth",
+                    "verify-reset-otp"
+                  ]
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": false,\n  \"error\": \"Invalid OTP. Please try again.\"\n}"
+            },
+            {
+              "name": "Error - Too Many Attempts (429)",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"email\": \"john@example.com\",\n  \"otp\": \"99999\"\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/users/auth/verify-reset-otp",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "users",
+                    "auth",
+                    "verify-reset-otp"
+                  ]
+                }
+              },
+              "status": "Too Many Requests",
+              "code": 429,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": false,\n  \"error\": \"Maximum OTP attempts exceeded. Please request a new password reset code.\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Reset Password",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"john@example.com\",\n  \"newPassword\": \"NewSecurePassword123\",\n  \"confirmPassword\": \"NewSecurePassword123\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/users/auth/reset-password",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "users",
+                "auth",
+                "reset-password"
+              ]
+            },
+            "description": "Reset password after OTP verification. Password must be at least 8 characters and both passwords must match. Make sure to verify OTP first via /verify-reset-otp endpoint."
+          },
+          "response": [
+            {
+              "name": "Success Response (200)",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"email\": \"john@example.com\",\n  \"newPassword\": \"NewSecurePassword123\",\n  \"confirmPassword\": \"NewSecurePassword123\"\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/users/auth/reset-password",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "users",
+                    "auth",
+                    "reset-password"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": true,\n  \"message\": \"Password reset successfully. You can now login with your new password.\",\n  \"data\": {\n    \"email\": \"john@example.com\"\n  }\n}"
+            },
+            {
+              "name": "Error - OTP Not Verified (400)",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"email\": \"john@example.com\",\n  \"newPassword\": \"NewSecurePassword123\",\n  \"confirmPassword\": \"NewSecurePassword123\"\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/users/auth/reset-password",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "users",
+                    "auth",
+                    "reset-password"
+                  ]
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": false,\n  \"error\": \"Please verify your OTP first before resetting password.\"\n}"
+            },
+            {
+              "name": "Error - Passwords Don't Match (400)",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"email\": \"john@example.com\",\n  \"newPassword\": \"NewSecurePassword123\",\n  \"confirmPassword\": \"DifferentPassword123\"\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/users/auth/reset-password",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "users",
+                    "auth",
+                    "reset-password"
+                  ]
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": false,\n  \"error\": \"Passwords do not match\"\n}"
+            },
+            {
+              "name": "Error - Password Too Short (400)",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"email\": \"john@example.com\",\n  \"newPassword\": \"short\",\n  \"confirmPassword\": \"short\"\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/users/auth/reset-password",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "users",
+                    "auth",
+                    "reset-password"
+                  ]
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": false,\n  \"error\": \"Password must be at least 8 characters long\"\n}"
             }
           ]
         }

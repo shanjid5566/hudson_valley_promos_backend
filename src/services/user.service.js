@@ -4,7 +4,7 @@ const { Pool } = require('pg');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { generateOTP, getOTPExpiry, isOTPExpired } = require('../utils/otp');
-const { sendOTPEmail, sendWelcomeEmail } = require('../utils/mailer');
+const { sendOTPEmail, sendWelcomeEmail, sendPasswordResetEmail } = require('../utils/mailer');
 
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
@@ -455,6 +455,178 @@ class UserService {
       };
     } catch (error) {
       throw new Error(`Failed to delete user: ${error.message}`);
+    }
+  }
+
+  /**
+   * Send password reset OTP to user's email
+   * @param {string} email - User email
+   * @returns {Promise<Object>} Result with success message
+   */
+  async forgotPassword(email) {
+    try {
+      // Find user by email
+      const user = await prisma.user.findUnique({
+        where: { email }
+      });
+
+      if (!user) {
+        throw new Error('Email not found');
+      }
+
+      if (!user.isEmailVerified) {
+        throw new Error('Please verify your email first before resetting password');
+      }
+
+      // Generate OTP
+      const otp = generateOTP();
+      const expiryTime = getOTPExpiry(parseInt(process.env.OTP_EXPIRY_MINUTES) || 10);
+
+      // Create or update OTP verification record for password reset
+      await prisma.oTPVerification.upsert({
+        where: { userId: user.id },
+        create: {
+          userId: user.id,
+          otp,
+          expiresAt: expiryTime,
+          attempts: 0
+        },
+        update: {
+          otp,
+          expiresAt: expiryTime,
+          attempts: 0
+        }
+      });
+
+      // Send password reset OTP email
+      await sendPasswordResetEmail(email, otp, user.firstName);
+
+      return {
+        success: true,
+        message: 'Password reset code sent to your email.',
+        email
+      };
+    } catch (error) {
+      throw new Error(`Forgot password failed: ${error.message}`);
+    }
+  }
+
+  /**
+   * Verify password reset OTP
+   * @param {string} email - User email
+   * @param {string} otp - OTP code to verify
+   * @returns {Promise<Object>} Verification result
+   */
+  async verifyResetOTP(email, otp) {
+    try {
+      // Find user by email
+      const user = await prisma.user.findUnique({
+        where: { email },
+        include: { otpVerification: true }
+      });
+
+      if (!user) {
+        throw new Error('User not found');
+      }
+
+      const otpRecord = user.otpVerification;
+
+      if (!otpRecord) {
+        throw new Error('No OTP found. Please request a new password reset code.');
+      }
+
+      // Check if OTP is expired
+      if (isOTPExpired(otpRecord.expiresAt)) {
+        throw new Error('OTP has expired. Please request a new password reset code.');
+      }
+
+      // Check attempts
+      if (otpRecord.attempts >= 3) {
+        throw new Error('Maximum OTP attempts exceeded. Please request a new password reset code.');
+      }
+
+      // Verify OTP
+      if (otpRecord.otp !== otp) {
+        // Increment attempts
+        await prisma.oTPVerification.update({
+          where: { id: otpRecord.id },
+          data: { attempts: otpRecord.attempts + 1 }
+        });
+        throw new Error('Invalid OTP. Please try again.');
+      }
+
+      // Mark as verified - don't delete yet, keep for reset password validation
+      await prisma.oTPVerification.update({
+        where: { id: otpRecord.id },
+        data: { isVerified: true }
+      });
+
+      return {
+        success: true,
+        message: 'OTP verified successfully. You can now reset your password.',
+        email,
+        userId: user.id
+      };
+    } catch (error) {
+      throw new Error(`OTP verification failed: ${error.message}`);
+    }
+  }
+
+  /**
+   * Reset password with verified OTP
+   * @param {string} email - User email
+   * @param {string} newPassword - New password
+   * @returns {Promise<Object>} Reset result
+   */
+  async resetPassword(email, newPassword) {
+    try {
+      // Find user by email
+      const user = await prisma.user.findUnique({
+        where: { email },
+        include: { otpVerification: true }
+      });
+
+      if (!user) {
+        throw new Error('User not found');
+      }
+
+      const otpRecord = user.otpVerification;
+
+      if (!otpRecord) {
+        throw new Error('No OTP found. Please verify your email first.');
+      }
+
+      // Check if OTP has been verified
+      if (!otpRecord.isVerified) {
+        throw new Error('Please verify your OTP first before resetting password.');
+      }
+
+      // Check if OTP is expired
+      if (isOTPExpired(otpRecord.expiresAt)) {
+        throw new Error('OTP has expired. Please request a new password reset code.');
+      }
+
+      // Hash new password
+      const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+      // Update password
+      await prisma.user.update({
+        where: { email },
+        data: { password: hashedPassword }
+      });
+
+      // Delete OTP record
+      await prisma.oTPVerification.delete({
+        where: { id: otpRecord.id }
+      });
+
+      return {
+        success: true,
+        message: 'Password reset successfully. You can now login with your new password.',
+        email
+      };
+    } catch (error) {
+      throw new Error(`Password reset failed: ${error.message}`);
     }
   }
 }

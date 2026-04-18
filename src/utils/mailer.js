@@ -132,7 +132,64 @@ const sendWelcomeEmail = async (email, userName = 'User') => {
   }
 };
 
+/**
+ * Send password reset OTP email
+ * @param {string} email - Recipient email
+ * @param {string} otp - OTP code
+ * @param {string} userName - User's name
+ * @returns {Promise<Object>} Email send result
+ */
+const sendPasswordResetEmail = async (email, otp, userName = 'User') => {
+  try {
+    const mailOptions = {
+      from: process.env.EMAIL_FROM,
+      to: email,
+      subject: 'Password Reset Request',
+      html: `
+        <div style="font-family: Arial, sans-serif; padding: 20px; background-color: #f5f5f5;">
+          <div style="max-width: 600px; margin: 0 auto; background-color: white; padding: 30px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+            <h2 style="color: #333; margin-bottom: 20px;">Password Reset Request</h2>
+            
+            <p style="color: #666; font-size: 16px;">Hi ${userName},</p>
+            
+            <p style="color: #666; font-size: 16px; line-height: 1.6;">
+              We received a request to reset your password. Use the following One-Time Password (OTP) to proceed with resetting your password.
+            </p>
+            
+            <div style="background-color: #f0f0f0; padding: 20px; text-align: center; border-radius: 4px; margin: 30px 0;">
+              <p style="color: #999; font-size: 12px; margin: 0 0 10px 0;">Your Reset Code:</p>
+              <p style="font-size: 32px; font-weight: bold; color: #333; letter-spacing: 5px; margin: 0;">${otp}</p>
+            </div>
+            
+            <p style="color: #666; font-size: 14px;">
+              <strong>Please note:</strong> This OTP will expire in 10 minutes. Do not share this code with anyone.
+            </p>
+            
+            <p style="color: #666; font-size: 14px; margin-top: 30px;">
+              If you didn't request a password reset, please ignore this email and your password will remain unchanged.
+            </p>
+            
+            <hr style="border: none; border-top: 1px solid #ddd; margin: 30px 0;">
+            
+            <p style="color: #999; font-size: 12px; text-align: center;">
+              SlimeDoesGamez © 2025. All rights reserved.
+            </p>
+          </div>
+        </div>
+      `
+    };
+
+    const result = await transporter.sendMail(mailOptions);
+    console.log(`Password reset email sent successfully to ${email}`);
+    return { success: true, messageId: result.messageId };
+  } catch (error) {
+    console.error(`Failed to send password reset email to ${email}:`, error);
+    throw new Error(`Failed to send password reset email: ${error.message}`);
+  }
+};
+
 module.exports = {
   sendOTPEmail,
-  sendWelcomeEmail
+  sendWelcomeEmail,
+  sendPasswordResetEmail
 };

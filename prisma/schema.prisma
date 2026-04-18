@@ -51,6 +51,7 @@ model OTPVerification {
   otp       String
   expiresAt DateTime
   attempts  Int      @default(0)
+  isVerified Boolean @default(false)
   
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -328,3 +329,7 @@ model Review {
   @@index([productId])
   @@index([userId])
 }
+
+
+
+

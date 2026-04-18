@@ -31,6 +31,21 @@ router.post('/auth/verify-otp', userController.verifyOTP.bind(userController));
 // @body {email}
 router.post('/auth/resend-otp', userController.resendOTP.bind(userController));
 
+// POST forgot password - send reset OTP
+// @route POST /api/users/auth/forgot-password
+// @body {email}
+router.post('/auth/forgot-password', userController.forgotPassword.bind(userController));
+
+// POST verify reset OTP
+// @route POST /api/users/auth/verify-reset-otp
+// @body {email, otp}
+router.post('/auth/verify-reset-otp', userController.verifyResetOTP.bind(userController));
+
+// POST reset password
+// @route POST /api/users/auth/reset-password
+// @body {email, otp, newPassword, confirmPassword}
+router.post('/auth/reset-password', userController.resetPassword.bind(userController));
+
 // ==========================================
 // User Management Routes (Protected - TODO: Add auth middleware)
 // ==========================================
