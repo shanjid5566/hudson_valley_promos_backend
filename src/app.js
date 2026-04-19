@@ -20,11 +20,19 @@ app.get('/health', (req, res) => {
 
 // Import routes
 const userRoutes = require('./routes/user.routes');
-const adminRoutes = require('./routes/admin.routes');
+const adminServicesRoutes = require('./routes/adminServices.routes');
+const adminCategoriesRoutes = require('./routes/adminCategories.routes');
+const adminSubcategoriesRoutes = require('./routes/adminSubcategories.routes');
+const adminSubcategoriesController = require('./controllers/adminSubcategories.controller');
 
 // Use routes
 app.use('/api/users', userRoutes);
-app.use('/api/admin', adminRoutes);
+app.use('/api/admin/services', adminServicesRoutes);
+app.use('/api/admin/categories', adminCategoriesRoutes);
+app.use('/api/admin/subcategories', adminSubcategoriesRoutes);
+
+// Nested route: Get subcategories of a specific category
+app.get('/api/admin/categories/:id/subcategories', adminSubcategoriesController.getSubcategoriesByCategory.bind(adminSubcategoriesController));
 
 // 404 handler - catch all undefined routes
 app.use((req, res) => {
