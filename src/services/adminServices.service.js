@@ -18,12 +18,13 @@ const prisma = new PrismaClient({
 class AdminServicesService {
   /**
    * Get all services with pagination
-   * @param {number} offset - Number of records to skip (default: 0)
+   * @param {number} page - Page number (default: 1)
    * @param {number} limit - Number of records to return (default: 10)
    * @returns {Promise<Object>} List of services with total count
    */
-  async getAllServices(offset = 0, limit = 10) {
+  async getAllServices(page = 1, limit = 10) {
     try {
+      const offset = (page - 1) * limit;
       const services = await prisma.service.findMany({
         orderBy: { createdAt: 'desc' },
         skip: offset,
@@ -35,7 +36,7 @@ class AdminServicesService {
       return {
         data: services,
         total,
-        offset,
+        page,
         limit,
         hasMore: offset + limit < total
       };

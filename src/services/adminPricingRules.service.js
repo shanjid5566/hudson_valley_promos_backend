@@ -7,12 +7,13 @@ const prisma = require('../utils/prisma');
 class AdminPricingRulesService {
   /**
    * Get all pricing rules with pagination
-   * @param {number} offset - Number of records to skip (default: 0)
+   * @param {number} page - Page number (default: 1)
    * @param {number} limit - Number of records to return (default: 10)
    * @returns {Promise<Object>} List of pricing rules with total count
    */
-  async getAllPricingRules(offset = 0, limit = 10) {
+  async getAllPricingRules(page = 1, limit = 10) {
     try {
+      const offset = (page - 1) * limit;
       const rules = await prisma.pricingRule.findMany({
         orderBy: { createdAt: 'desc' },
         skip: offset,
@@ -24,7 +25,7 @@ class AdminPricingRulesService {
       return {
         data: rules,
         total,
-        offset,
+        page,
         limit,
         hasMore: offset + limit < total
       };

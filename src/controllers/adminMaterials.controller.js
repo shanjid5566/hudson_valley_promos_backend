@@ -7,20 +7,20 @@ const adminMaterialsService = require('../services/adminMaterials.service');
 class AdminMaterialsController {
   /**
    * Get all materials
-   * @route GET /api/admin/materials?offset=0&limit=10
+   * @route GET /api/admin/materials?page=1&limit=10
    */
   async getAllMaterials(req, res, next) {
     try {
-      const offset = Math.max(0, parseInt(req.query.offset) || 0);
+      const page = Math.max(1, parseInt(req.query.page) || 1);
       const limit = Math.max(1, Math.min(100, parseInt(req.query.limit) || 10));
 
-      const result = await adminMaterialsService.getAllMaterials(offset, limit);
+      const result = await adminMaterialsService.getAllMaterials(page, limit);
 
       res.status(200).json({
         success: true,
         data: result.data,
         pagination: {
-          offset: result.offset,
+          page: result.page,
           limit: result.limit,
           total: result.total,
           hasMore: result.hasMore

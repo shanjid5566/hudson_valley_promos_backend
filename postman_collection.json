@@ -1171,7 +1171,7 @@
                                     }
                                 ],
                                 "url": {
-                                    "raw": "{{base_url}}/api/admin/services?offset=0&limit=10",
+                                    "raw": "{{base_url}}/api/admin/services?page=1&limit=10",
                                     "host": [
                                         "{{base_url}}"
                                     ],
@@ -1182,8 +1182,8 @@
                                     ],
                                     "query": [
                                         {
-                                            "key": "offset",
-                                            "value": "0",
+                                            "key": "page",
+                                            "value": "1",
                                             "disabled": false
                                         },
                                         {
@@ -1193,7 +1193,7 @@
                                         }
                                     ]
                                 },
-                                "description": "Retrieve all services with pagination\n\nQuery parameters:\n- offset (number): Records to skip (default: 0)\n- limit (number): Records to return (default: 10, max: 100)"
+                                "description": "Retrieve all services with pagination\n\nQuery parameters:\n- page (number): Page number (default: 1, min: 1)\n- limit (number): Records to return (default: 10, max: 100)"
                             }
                         },
                         {
@@ -1887,7 +1887,7 @@
                                     }
                                 ],
                                 "url": {
-                                    "raw": "{{base_url}}/api/admin/pricing-rules?offset=0&limit=10",
+                                    "raw": "{{base_url}}/api/admin/pricing-rules?page=1&limit=10",
                                     "host": [
                                         "{{base_url}}"
                                     ],
@@ -1898,8 +1898,8 @@
                                     ],
                                     "query": [
                                         {
-                                            "key": "offset",
-                                            "value": "0",
+                                            "key": "page",
+                                            "value": "1",
                                             "disabled": false
                                         },
                                         {
@@ -1909,7 +1909,7 @@
                                         }
                                     ]
                                 },
-                                "description": "Get all pricing rules with pagination (public endpoint)\n\nQuery parameters:\n- offset (number): Records to skip (default: 0)\n- limit (number): Records to return (default: 10, max: 100)"
+                                "description": "Get all pricing rules with pagination (public endpoint)\n\nQuery parameters:\n- page (number): Page number (default: 1, min: 1)\n- limit (number): Records to return (default: 10, max: 100)"
                             },
                             "response": [
                                 {
@@ -1918,7 +1918,7 @@
                                         "method": "GET",
                                         "header": [],
                                         "url": {
-                                            "raw": "{{base_url}}/api/admin/pricing-rules?offset=0&limit=10",
+                                            "raw": "{{base_url}}/api/admin/pricing-rules?page=1&limit=10",
                                             "host": [
                                                 "{{base_url}}"
                                             ],
@@ -1929,8 +1929,8 @@
                                             ],
                                             "query": [
                                                 {
-                                                    "key": "offset",
-                                                    "value": "0"
+                                                    "key": "page",
+                                                    "value": "1"
                                                 },
                                                 {
                                                     "key": "limit",
@@ -1941,7 +1941,7 @@
                                     },
                                     "status": "OK",
                                     "code": 200,
-                                    "body": "{\n  \"success\": true,\n  \"data\": [\n    {\n      \"id\": \"rule-1\",\n      \"name\": \"Shipping cost\",\n      \"type\": \"FIXED\",\n      \"value\": \"15.98\",\n      \"description\": \"Shipping cost for all products\",\n      \"createdAt\": \"2024-01-01T00:00:00Z\",\n      \"updatedAt\": \"2024-01-01T00:00:00Z\"\n    },\n    {\n      \"id\": \"rule-2\",\n      \"name\": \"Customization Fee\",\n      \"type\": \"FIXED\",\n      \"value\": \"8.00\",\n      \"description\": \"Additional fee for customization\",\n      \"createdAt\": \"2024-01-01T00:00:00Z\",\n      \"updatedAt\": \"2024-01-01T00:00:00Z\"\n    },\n    {\n      \"id\": \"rule-3\",\n      \"name\": \"Printing Fee\",\n      \"type\": \"PERCENTAGE\",\n      \"value\": \"15\",\n      \"description\": \"Printing fee percentage\",\n      \"createdAt\": \"2024-01-01T00:00:00Z\",\n      \"updatedAt\": \"2024-01-01T00:00:00Z\"\n    }\n  ],\n  \"pagination\": {\n    \"offset\": 0,\n    \"limit\": 10,\n    \"total\": 3,\n    \"hasMore\": false\n  }\n}"
+                                    "body": "{\n  \"success\": true,\n  \"data\": [\n    {\n      \"id\": \"rule-1\",\n      \"name\": \"Shipping cost\",\n      \"type\": \"FIXED\",\n      \"value\": \"15.98\",\n      \"description\": \"Shipping cost for all products\",\n      \"createdAt\": \"2024-01-01T00:00:00Z\",\n      \"updatedAt\": \"2024-01-01T00:00:00Z\"\n    },\n    {\n      \"id\": \"rule-2\",\n      \"name\": \"Customization Fee\",\n      \"type\": \"FIXED\",\n      \"value\": \"8.00\",\n      \"description\": \"Additional fee for customization\",\n      \"createdAt\": \"2024-01-01T00:00:00Z\",\n      \"updatedAt\": \"2024-01-01T00:00:00Z\"\n    },\n    {\n      \"id\": \"rule-3\",\n      \"name\": \"Printing Fee\",\n      \"type\": \"PERCENTAGE\",\n      \"value\": \"15\",\n      \"description\": \"Printing fee percentage\",\n      \"createdAt\": \"2024-01-01T00:00:00Z\",\n      \"updatedAt\": \"2024-01-01T00:00:00Z\"\n    }\n  ],\n  \"pagination\": {\n    \"page\": 1,\n    \"limit\": 10,\n    \"total\": 3,\n    \"hasMore\": false\n  }\n}"
                                 }
                             ]
                         },
@@ -2137,7 +2137,7 @@
                                     }
                                 ],
                                 "url": {
-                                    "raw": "{{base_url}}/api/admin/materials?offset=0&limit=10",
+                                    "raw": "{{base_url}}/api/admin/materials?page=1&limit=10",
                                     "host": [
                                         "{{base_url}}"
                                     ],
@@ -2148,8 +2148,8 @@
                                     ],
                                     "query": [
                                         {
-                                            "key": "offset",
-                                            "value": "0",
+                                            "key": "page",
+                                            "value": "1",
                                             "disabled": false
                                         },
                                         {
@@ -2159,14 +2159,14 @@
                                         }
                                     ]
                                 },
-                                "description": "Get all materials with pagination (public endpoint)\n\nQuery parameters:\n- offset (number): Records to skip (default: 0)\n- limit (number): Records to return (default: 10, max: 100)"
+                                "description": "Get all materials with pagination (public endpoint)\n\nQuery parameters:\n- page (number): Page number (default: 1, min: 1)\n- limit (number): Records to return (default: 10, max: 100)"
                             },
                             "response": [
                                 {
                                     "name": "Success Response (200)",
                                     "status": "OK",
                                     "code": 200,
-                                    "body": "{\n  \"success\": true,\n  \"data\": [\n    {\n      \"id\": \"material-1\",\n      \"name\": \"100% Cotton\",\n      \"categoryId\": \"category-1\",\n      \"category\": {\n        \"id\": \"category-1\",\n        \"name\": \"Apparel\",\n        \"serviceId\": \"service-1\"\n      },\n      \"createdAt\": \"2024-01-01T00:00:00Z\",\n      \"updatedAt\": \"2024-01-01T00:00:00Z\"\n    },\n    {\n      \"id\": \"material-2\",\n      \"name\": \"Cotton/Polyester Blend\",\n      \"categoryId\": \"category-1\",\n      \"category\": {\n        \"id\": \"category-1\",\n        \"name\": \"Apparel\",\n        \"serviceId\": \"service-1\"\n      },\n      \"createdAt\": \"2024-01-01T00:00:00Z\",\n      \"updatedAt\": \"2024-01-01T00:00:00Z\"\n    },\n    {\n      \"id\": \"material-3\",\n      \"name\": \"Ceramic\",\n      \"categoryId\": \"category-2\",\n      \"category\": {\n        \"id\": \"category-2\",\n        \"name\": \"Drinkware\",\n        \"serviceId\": \"service-1\"\n      },\n      \"createdAt\": \"2024-01-01T00:00:00Z\",\n      \"updatedAt\": \"2024-01-01T00:00:00Z\"\n    }\n  ],\n  \"pagination\": {\n    \"offset\": 0,\n    \"limit\": 10,\n    \"total\": 3,\n    \"hasMore\": false\n  }\n}"
+                                    "body": "{\n  \"success\": true,\n  \"data\": [\n    {\n      \"id\": \"material-1\",\n      \"name\": \"100% Cotton\",\n      \"categoryId\": \"category-1\",\n      \"category\": {\n        \"id\": \"category-1\",\n        \"name\": \"Apparel\",\n        \"serviceId\": \"service-1\"\n      },\n      \"createdAt\": \"2024-01-01T00:00:00Z\",\n      \"updatedAt\": \"2024-01-01T00:00:00Z\"\n    },\n    {\n      \"id\": \"material-2\",\n      \"name\": \"Cotton/Polyester Blend\",\n      \"categoryId\": \"category-1\",\n      \"category\": {\n        \"id\": \"category-1\",\n        \"name\": \"Apparel\",\n        \"serviceId\": \"service-1\"\n      },\n      \"createdAt\": \"2024-01-01T00:00:00Z\",\n      \"updatedAt\": \"2024-01-01T00:00:00Z\"\n    },\n    {\n      \"id\": \"material-3\",\n      \"name\": \"Ceramic\",\n      \"categoryId\": \"category-2\",\n      \"category\": {\n        \"id\": \"category-2\",\n        \"name\": \"Drinkware\",\n        \"serviceId\": \"service-1\"\n      },\n      \"createdAt\": \"2024-01-01T00:00:00Z\",\n      \"updatedAt\": \"2024-01-01T00:00:00Z\"\n    }\n  ],\n  \"pagination\": {\n    \"page\": 1,\n    \"limit\": 10,\n    \"total\": 3,\n    \"hasMore\": false\n  }\n}"
                                 }
                             ]
                         },
@@ -2380,6 +2380,247 @@
                             ]
                         }
                     ]
+                },
+                {
+                    "name": "Printing Methods",
+                    "description": "Admin endpoints for managing printing methods (Screen Printing, DTG, Heat Transfer, etc.)",
+                    "item": [
+                        {
+                            "name": "Get All Printing Methods",
+                            "event": [
+                                {
+                                    "listen": "test",
+                                    "script": {
+                                        "exec": [
+                                            "if (pm.response.code === 200) {",
+                                            "    const jsonData = pm.response.json();",
+                                            "    if (jsonData.data && jsonData.data.length > 0) {",
+                                            "        pm.environment.set('printingMethodId', jsonData.data[0].id);",
+                                            "    }",
+                                            "}"
+                                        ],
+                                        "type": "text/javascript"
+                                    }
+                                }
+                            ],
+                            "request": {
+                                "method": "GET",
+                                "header": [
+                                    {
+                                        "key": "Content-Type",
+                                        "value": "application/json",
+                                        "type": "text"
+                                    }
+                                ],
+                                "url": {
+                                    "raw": "{{base_url}}/api/admin/printing-methods?page=1&limit=10",
+                                    "host": [
+                                        "{{base_url}}"
+                                    ],
+                                    "path": [
+                                        "api",
+                                        "admin",
+                                        "printing-methods"
+                                    ],
+                                    "query": [
+                                        {
+                                            "key": "page",
+                                            "value": "1",
+                                            "disabled": false
+                                        },
+                                        {
+                                            "key": "limit",
+                                            "value": "10",
+                                            "disabled": false
+                                        }
+                                    ]
+                                },
+                                "description": "Get all printing methods with pagination (public endpoint)\n\nQuery parameters:\n- page (number): Page number (default: 1, min: 1)\n- limit (number): Records to return (default: 10, max: 100)"
+                            },
+                            "response": [
+                                {
+                                    "name": "Success Response (200)",
+                                    "status": "OK",
+                                    "code": 200,
+                                    "body": "{\n  \"success\": true,\n  \"data\": [\n    {\n      \"id\": \"method-1\",\n      \"name\": \"Screen Printing\",\n      \"description\": \"Traditional screen printing method\",\n      \"createdAt\": \"2024-01-01T00:00:00Z\",\n      \"updatedAt\": \"2024-01-01T00:00:00Z\"\n    },\n    {\n      \"id\": \"method-2\",\n      \"name\": \"DTG (Direct to Garment)\",\n      \"description\": \"Digital direct-to-garment printing\",\n      \"createdAt\": \"2024-01-01T00:00:00Z\",\n      \"updatedAt\": \"2024-01-01T00:00:00Z\"\n    },\n    {\n      \"id\": \"method-3\",\n      \"name\": \"Heat Transfer\",\n      \"description\": \"Heat transfer printing method\",\n      \"createdAt\": \"2024-01-01T00:00:00Z\",\n      \"updatedAt\": \"2024-01-01T00:00:00Z\"\n    }\n  ],\n  \"pagination\": {\n    \"page\": 1,\n    \"limit\": 10,\n    \"total\": 3,\n    \"hasMore\": false\n  }\n}"
+                                }
+                            ]
+                        },
+                        {
+                            "name": "Get Printing Method by ID",
+                            "request": {
+                                "method": "GET",
+                                "header": [
+                                    {
+                                        "key": "Content-Type",
+                                        "value": "application/json",
+                                        "type": "text"
+                                    }
+                                ],
+                                "url": {
+                                    "raw": "{{base_url}}/api/admin/printing-methods/{{printingMethodId}}",
+                                    "host": [
+                                        "{{base_url}}"
+                                    ],
+                                    "path": [
+                                        "api",
+                                        "admin",
+                                        "printing-methods",
+                                        "{{printingMethodId}}"
+                                    ]
+                                },
+                                "description": "Get a single printing method by ID"
+                            },
+                            "response": [
+                                {
+                                    "name": "Success Response (200)",
+                                    "status": "OK",
+                                    "code": 200,
+                                    "body": "{\n  \"success\": true,\n  \"data\": {\n    \"id\": \"method-1\",\n    \"name\": \"Screen Printing\",\n    \"description\": \"Traditional screen printing method\",\n    \"createdAt\": \"2024-01-01T00:00:00Z\",\n    \"updatedAt\": \"2024-01-01T00:00:00Z\"\n  }\n}"
+                                }
+                            ]
+                        },
+                        {
+                            "name": "Create Printing Method",
+                            "event": [
+                                {
+                                    "listen": "test",
+                                    "script": {
+                                        "exec": [
+                                            "if (pm.response.code === 201) {",
+                                            "    const jsonData = pm.response.json();",
+                                            "    if (jsonData.data && jsonData.data.id) {",
+                                            "        pm.environment.set('printingMethodId', jsonData.data.id);",
+                                            "    }",
+                                            "}"
+                                        ],
+                                        "type": "text/javascript"
+                                    }
+                                }
+                            ],
+                            "request": {
+                                "method": "POST",
+                                "header": [
+                                    {
+                                        "key": "Content-Type",
+                                        "value": "application/json",
+                                        "type": "text"
+                                    },
+                                    {
+                                        "key": "Authorization",
+                                        "value": "Bearer {{adminToken}}",
+                                        "type": "text"
+                                    }
+                                ],
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": "{\n  \"name\": \"Screen Printing\",\n  \"description\": \"Traditional screen printing method\"\n}"
+                                },
+                                "url": {
+                                    "raw": "{{base_url}}/api/admin/printing-methods",
+                                    "host": [
+                                        "{{base_url}}"
+                                    ],
+                                    "path": [
+                                        "api",
+                                        "admin",
+                                        "printing-methods"
+                                    ]
+                                },
+                                "description": "Create a new printing method (admin only)\n\nBody parameters:\n- name (string): Name of the printing method (must be unique)\n- description (string, optional): Description of the printing method"
+                            },
+                            "response": [
+                                {
+                                    "name": "Success Response (201)",
+                                    "status": "Created",
+                                    "code": 201,
+                                    "body": "{\n  \"success\": true,\n  \"message\": \"Printing method created successfully\",\n  \"data\": {\n    \"id\": \"new-method-id\",\n    \"name\": \"Screen Printing\",\n    \"description\": \"Traditional screen printing method\",\n    \"createdAt\": \"2024-01-15T10:30:00Z\",\n    \"updatedAt\": \"2024-01-15T10:30:00Z\"\n  }\n}"
+                                }
+                            ]
+                        },
+                        {
+                            "name": "Update Printing Method",
+                            "request": {
+                                "method": "PUT",
+                                "header": [
+                                    {
+                                        "key": "Content-Type",
+                                        "value": "application/json",
+                                        "type": "text"
+                                    },
+                                    {
+                                        "key": "Authorization",
+                                        "value": "Bearer {{adminToken}}",
+                                        "type": "text"
+                                    }
+                                ],
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": "{\n  \"name\": \"Screen Printing (Updated)\",\n  \"description\": \"Traditional screen printing method with update\"\n}"
+                                },
+                                "url": {
+                                    "raw": "{{base_url}}/api/admin/printing-methods/{{printingMethodId}}",
+                                    "host": [
+                                        "{{base_url}}"
+                                    ],
+                                    "path": [
+                                        "api",
+                                        "admin",
+                                        "printing-methods",
+                                        "{{printingMethodId}}"
+                                    ]
+                                },
+                                "description": "Update an existing printing method (admin only)"
+                            },
+                            "response": [
+                                {
+                                    "name": "Success Response (200)",
+                                    "status": "OK",
+                                    "code": 200,
+                                    "body": "{\n  \"success\": true,\n  \"message\": \"Printing method updated successfully\",\n  \"data\": {\n    \"id\": \"method-1\",\n    \"name\": \"Screen Printing (Updated)\",\n    \"description\": \"Traditional screen printing method with update\",\n    \"createdAt\": \"2024-01-01T00:00:00Z\",\n    \"updatedAt\": \"2024-01-15T10:35:00Z\"\n  }\n}"
+                                }
+                            ]
+                        },
+                        {
+                            "name": "Delete Printing Method",
+                            "request": {
+                                "method": "DELETE",
+                                "header": [
+                                    {
+                                        "key": "Content-Type",
+                                        "value": "application/json",
+                                        "type": "text"
+                                    },
+                                    {
+                                        "key": "Authorization",
+                                        "value": "Bearer {{adminToken}}",
+                                        "type": "text"
+                                    }
+                                ],
+                                "url": {
+                                    "raw": "{{base_url}}/api/admin/printing-methods/{{printingMethodId}}",
+                                    "host": [
+                                        "{{base_url}}"
+                                    ],
+                                    "path": [
+                                        "api",
+                                        "admin",
+                                        "printing-methods",
+                                        "{{printingMethodId}}"
+                                    ]
+                                },
+                                "description": "Delete a printing method (admin only)"
+                            },
+                            "response": [
+                                {
+                                    "name": "Success Response (200)",
+                                    "status": "OK",
+                                    "code": 200,
+                                    "body": "{\n  \"success\": true,\n  \"message\": \"Printing method deleted successfully\"\n}"
+                                }
+                            ]
+                        }
+                    ]
                 }
             ]
         }
@@ -2412,6 +2653,11 @@
         },
         {
             "key": "materialId",
+            "value": "",
+            "type": "string"
+        },
+        {
+            "key": "printingMethodId",
             "value": "",
             "type": "string"
         },

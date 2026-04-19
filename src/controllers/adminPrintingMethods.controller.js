@@ -1,20 +1,20 @@
-const adminServicesService = require('../services/adminServices.service');
+const adminPrintingMethodsService = require('../services/adminPrintingMethods.service');
 
 /**
- * Admin Services Controller
- * Handles HTTP requests for service management
+ * Admin Printing Methods Controller
+ * Handles HTTP requests for printing method management
  */
-class AdminServicesController {
+class AdminPrintingMethodsController {
   /**
-   * Get all services
-   * @route GET /api/admin/services?page=1&limit=10
+   * Get all printing methods
+   * @route GET /api/admin/printing-methods?page=1&limit=10
    */
-  async getAllServices(req, res, next) {
+  async getAllPrintingMethods(req, res, next) {
     try {
       const page = Math.max(1, parseInt(req.query.page) || 1);
       const limit = Math.max(1, Math.min(100, parseInt(req.query.limit) || 10));
 
-      const result = await adminServicesService.getAllServices(page, limit);
+      const result = await adminPrintingMethodsService.getAllPrintingMethods(page, limit);
 
       res.status(200).json({
         success: true,
@@ -35,27 +35,21 @@ class AdminServicesController {
   }
 
   /**
-   * Get single service by ID
-   * @route GET /api/admin/services/:id
+   * Get single printing method by ID
+   * @route GET /api/admin/printing-methods/:id
    */
-  async getServiceById(req, res, next) {
+  async getPrintingMethodById(req, res, next) {
     try {
       const { id } = req.params;
-      const service = await adminServicesService.getServiceById(id);
-
-      if (!service) {
-        return res.status(404).json({
-          success: false,
-          error: 'Service not found'
-        });
-      }
+      const method = await adminPrintingMethodsService.getPrintingMethodById(id);
 
       res.status(200).json({
         success: true,
-        data: service
+        data: method
       });
     } catch (error) {
-      res.status(400).json({
+      const statusCode = error.message.includes('not found') ? 404 : 400;
+      res.status(statusCode).json({
         success: false,
         error: error.message
       });
@@ -63,34 +57,30 @@ class AdminServicesController {
   }
 
   /**
-   * Create new service
-   * @route POST /api/admin/services
-   * @body {name, description} - slug is auto-generated from name
+   * Create new printing method
+   * @route POST /api/admin/printing-methods
+   * @body {name, description}
    */
-  async createService(req, res, next) {
+  async createPrintingMethod(req, res, next) {
     try {
       const { name, description } = req.body;
 
       if (!name || name.trim() === '') {
         return res.status(400).json({
           success: false,
-          error: 'Service name is required'
+          error: 'Printing method name is required'
         });
       }
 
-      // Auto-generate slug from name
-      const slug = name.trim().toLowerCase().replace(/\s+/g, '-');
-
-      const service = await adminServicesService.createService({
+      const method = await adminPrintingMethodsService.createPrintingMethod({
         name: name.trim(),
-        slug,
-        description: description || null
+        description: description ? description.trim() : null
       });
 
       res.status(201).json({
         success: true,
-        message: 'Service created successfully',
-        data: service
+        message: 'Printing method created successfully',
+        data: method
       });
     } catch (error) {
       const statusCode = error.message.includes('already exists') ? 409 : 400;
@@ -102,27 +92,28 @@ class AdminServicesController {
   }
 
   /**
-   * Update service
-   * @route PUT /api/admin/services/:id
+   * Update printing method
+   * @route PUT /api/admin/printing-methods/:id
    * @body {name, description}
    */
-  async updateService(req, res, next) {
+  async updatePrintingMethod(req, res, next) {
     try {
       const { id } = req.params;
       const { name, description } = req.body;
 
-      const service = await adminServicesService.updateService(id, {
+      const method = await adminPrintingMethodsService.updatePrintingMethod(id, {
         name,
         description
       });
 
       res.status(200).json({
         success: true,
-        message: 'Service updated successfully',
-        data: service
+        message: 'Printing method updated successfully',
+        data: method
       });
     } catch (error) {
-      const statusCode = error.message.includes('not found') ? 404 : 400;
+      const statusCode = error.message.includes('not found') ? 404 : 
+                        error.message.includes('already exists') ? 409 : 400;
       res.status(statusCode).json({
         success: false,
         error: error.message
@@ -131,18 +122,18 @@ class AdminServicesController {
   }
 
   /**
-   * Delete service
-   * @route DELETE /api/admin/services/:id
+   * Delete printing method
+   * @route DELETE /api/admin/printing-methods/:id
    */
-  async deleteService(req, res, next) {
+  async deletePrintingMethod(req, res, next) {
     try {
       const { id } = req.params;
 
-      const result = await adminServicesService.deleteService(id);
+      await adminPrintingMethodsService.deletePrintingMethod(id);
 
       res.status(200).json({
         success: true,
-        message: result.message
+        message: 'Printing method deleted successfully'
       });
     } catch (error) {
       const statusCode = error.message.includes('not found') ? 404 : 400;
@@ -154,4 +145,4 @@ class AdminServicesController {
   }
 }
 
-module.exports = new AdminServicesController();
+module.exports = new AdminPrintingMethodsController();

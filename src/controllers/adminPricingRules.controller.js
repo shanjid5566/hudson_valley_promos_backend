@@ -7,20 +7,20 @@ const adminPricingRulesService = require('../services/adminPricingRules.service'
 class AdminPricingRulesController {
   /**
    * Get all pricing rules
-   * @route GET /api/admin/pricing-rules?offset=0&limit=10
+   * @route GET /api/admin/pricing-rules?page=1&limit=10
    */
   async getAllPricingRules(req, res, next) {
     try {
-      const offset = Math.max(0, parseInt(req.query.offset) || 0);
+      const page = Math.max(1, parseInt(req.query.page) || 1);
       const limit = Math.max(1, Math.min(100, parseInt(req.query.limit) || 10));
 
-      const result = await adminPricingRulesService.getAllPricingRules(offset, limit);
+      const result = await adminPricingRulesService.getAllPricingRules(page, limit);
 
       res.status(200).json({
         success: true,
         data: result.data,
         pagination: {
-          offset: result.offset,
+          page: result.page,
           limit: result.limit,
           total: result.total,
           hasMore: result.hasMore

@@ -7,12 +7,13 @@ const prisma = require('../utils/prisma');
 class AdminMaterialsService {
   /**
    * Get all materials with pagination
-   * @param {number} offset - Number of records to skip (default: 0)
+   * @param {number} page - Page number (default: 1)
    * @param {number} limit - Number of records to return (default: 10)
    * @returns {Promise<Object>} List of materials with total count
    */
-  async getAllMaterials(offset = 0, limit = 10) {
+  async getAllMaterials(page = 1, limit = 10) {
     try {
+      const offset = (page - 1) * limit;
       const materials = await prisma.material.findMany({
         include: {
           category: {
@@ -29,7 +30,7 @@ class AdminMaterialsService {
       return {
         data: materials,
         total,
-        offset,
+        page,
         limit,
         hasMore: offset + limit < total
       };
