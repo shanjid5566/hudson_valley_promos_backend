@@ -4,7 +4,7 @@
 // Get a free hosted Postgres database in seconds: `npx create-db`
 
 generator client {
-  provider = "prisma-client-js"
+  provider   = "prisma-client-js"
   engineType = "binary"
 }
 
@@ -22,15 +22,15 @@ enum Role {
 }
 
 model User {
-  id              String   @id @default(uuid())
-  email           String   @unique
+  id              String  @id @default(uuid())
+  email           String  @unique
   password        String
   firstName       String?
   lastName        String?
   phone           String?
-  role            Role     @default(CUSTOMER)
+  role            Role    @default(CUSTOMER)
   avatarUrl       String?
-  isEmailVerified Boolean  @default(false)
+  isEmailVerified Boolean @default(false)
 
   addresses       Address[]
   orders          Order[]
@@ -38,21 +38,21 @@ model User {
   cart            Cart?
   otpVerification OTPVerification?
 
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@index([email])
 }
 
 model OTPVerification {
-  id        String   @id @default(uuid())
-  userId    String   @unique
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  otp       String
-  expiresAt DateTime
-  attempts  Int      @default(0)
-  isVerified Boolean @default(false)
-  
+  id         String   @id @default(uuid())
+  userId     String   @unique
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  otp        String
+  expiresAt  DateTime
+  attempts   Int      @default(0)
+  isVerified Boolean  @default(false)
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
@@ -63,21 +63,21 @@ enum AddressType {
 }
 
 model Address {
-  id         String      @id @default(uuid())
-  userId     String
-  user       User        @relation(fields: [userId], references: [id], onDelete: Cascade)
-  type       AddressType
-  company    String?
-  street     String
-  city       String
-  state      String
-  zipCode    String
-  isDefault  Boolean     @default(false)
+  id        String      @id @default(uuid())
+  userId    String
+  user      User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type      AddressType
+  company   String?
+  street    String
+  city      String
+  state     String
+  zipCode   String
+  isDefault Boolean     @default(false)
 
-  orders     Order[]
+  orders Order[]
 
-  createdAt  DateTime    @default(now())
-  updatedAt  DateTime    @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@index([userId])
 }
@@ -87,52 +87,52 @@ model Address {
 // ==========================================
 
 model Service {
-  id          String       @id @default(uuid())
-  name        String       @unique
-  slug        String       @unique
-  description String?      @db.Text
-  icon        String?      // Icon URL or class name
-  
-  categories  Category[]   // Direct categories under this service
+  id          String  @id @default(uuid())
+  name        String  @unique
+  slug        String  @unique
+  description String? @db.Text
+  icon        String? // Icon URL or class name
 
-  createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @updatedAt
+  categories Category[] // Direct categories under this service
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@index([slug])
 }
 
 model Category {
-  id          String        @id @default(uuid())
-  serviceId   String
-  service     Service       @relation(fields: [serviceId], references: [id], onDelete: Cascade)
-  
-  name        String
-  slug        String        @unique
-  description String?
-  
-  subcategories Subcategory[]
-  products    Product[]
+  id        String  @id @default(uuid())
+  serviceId String
+  service   Service @relation(fields: [serviceId], references: [id], onDelete: Cascade)
 
-  createdAt   DateTime      @default(now())
-  updatedAt   DateTime      @updatedAt
+  name        String
+  slug        String  @unique
+  description String?
+
+  subcategories Subcategory[]
+  products      Product[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@index([serviceId])
   @@index([slug])
 }
 
 model Subcategory {
-  id          String   @id @default(uuid())
-  categoryId  String
-  category    Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
-  
-  name        String
-  slug        String   @unique
-  description String?
-  
-  products    Product[]
+  id         String   @id @default(uuid())
+  categoryId String
+  category   Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
 
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  name        String
+  slug        String  @unique
+  description String?
+
+  products Product[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@index([categoryId])
   @@index([slug])
@@ -146,31 +146,31 @@ model Product {
   subcategory   Subcategory? @relation(fields: [subcategoryId], references: [id])
   name          String
   slug          String       @unique
-  description   String   @db.Text
-  basePrice     Decimal  @db.Decimal(10, 2)
+  description   String       @db.Text
+  basePrice     Decimal      @db.Decimal(10, 2)
   images        String[] // Array of image URLs
-  isFeatured    Boolean  @default(false)
-  
-  pricingTiers  PricingTier[]
-  attributes    ProductAttribute[]
-  reviews       Review[]
-  cartItems     CartItem[]
-  orderItems    OrderItem[]
+  isFeatured    Boolean      @default(false)
 
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  pricingTiers PricingTier[]
+  attributes   ProductAttribute[]
+  reviews      Review[]
+  cartItems    CartItem[]
+  orderItems   OrderItem[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@index([categoryId])
 }
 
 // "Buy more, Save more" logic
 model PricingTier {
-  id           String   @id @default(uuid())
-  productId    String
-  product      Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
-  minQuantity  Int
-  maxQuantity  Int?     // Null means unlimited/250+
-  unitPrice    Decimal  @db.Decimal(10, 2)
+  id          String  @id @default(uuid())
+  productId   String
+  product     Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  minQuantity Int
+  maxQuantity Int? // Null means unlimited/250+
+  unitPrice   Decimal @db.Decimal(10, 2)
 
   @@index([productId])
 }
@@ -189,29 +189,49 @@ enum AttributeType {
 
 // e.g., "Print Method", "Color Options", "Size Options"
 model ProductAttribute {
-  id          String   @id @default(uuid())
-  productId   String
-  product     Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
-  name        String
-  type        AttributeType
-  isRequired  Boolean  @default(true)
-  order       Int      @default(0) // For UI sorting
+  id         String        @id @default(uuid())
+  productId  String
+  product    Product       @relation(fields: [productId], references: [id], onDelete: Cascade)
+  name       String
+  type       AttributeType
+  isRequired Boolean       @default(true)
+  order      Int           @default(0) // For UI sorting
 
-  options     AttributeOption[]
+  options AttributeOption[]
 
   @@index([productId])
 }
 
 // e.g., "Screen Printing", "Red", "Large"
 model AttributeOption {
-  id            String           @id @default(uuid())
-  attributeId   String
-  attribute     ProductAttribute @relation(fields: [attributeId], references: [id], onDelete: Cascade)
-  value         String
-  metaValue     String?          // Hex code for colors, etc.
-  extraCost     Decimal          @default(0.00) @db.Decimal(10, 2)
+  id          String           @id @default(uuid())
+  attributeId String
+  attribute   ProductAttribute @relation(fields: [attributeId], references: [id], onDelete: Cascade)
+  value       String
+  metaValue   String? // Hex code for colors, etc.
+  extraCost   Decimal          @default(0.00) @db.Decimal(10, 2)
 
   @@index([attributeId])
+}
+
+// ==========================================
+// Pricing Rules (Global Platform Fees)
+// ==========================================
+
+enum PricingRuleType {
+  FIXED
+  PERCENTAGE
+}
+
+model PricingRule {
+  id          String          @id @default(uuid())
+  name        String          @unique
+  type        PricingRuleType @default(FIXED)
+  value       Decimal         @db.Decimal(10, 2)
+  description String?         @db.Text
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 // ==========================================
@@ -219,27 +239,27 @@ model AttributeOption {
 // ==========================================
 
 model Cart {
-  id        String     @id @default(uuid())
-  userId    String     @unique
-  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
-  items     CartItem[]
-  
-  updatedAt DateTime   @updatedAt
+  id     String     @id @default(uuid())
+  userId String     @unique
+  user   User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  items  CartItem[]
+
+  updatedAt DateTime @updatedAt
 }
 
 model CartItem {
-  id                   String   @id @default(uuid())
-  cartId               String
-  cart                 Cart     @relation(fields: [cartId], references: [id], onDelete: Cascade)
-  productId            String
-  product              Product  @relation(fields: [productId], references: [id])
-  quantity             Int
-  
-  // Storing complex user choices (e.g., logo URL, selected text, selected color)
-  customizationDetails Json?    
+  id        String  @id @default(uuid())
+  cartId    String
+  cart      Cart    @relation(fields: [cartId], references: [id], onDelete: Cascade)
+  productId String
+  product   Product @relation(fields: [productId], references: [id])
+  quantity  Int
 
-  createdAt            DateTime @default(now())
-  updatedAt            DateTime @updatedAt
+  // Storing complex user choices (e.g., logo URL, selected text, selected color)
+  customizationDetails Json?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@index([cartId])
 }
@@ -252,46 +272,46 @@ enum OrderStatus {
 }
 
 model Order {
-  id                    String      @id @default(uuid())
-  orderNumber           String      @unique // E.g., #45897
-  userId                String
-  user                  User        @relation(fields: [userId], references: [id])
-  shippingAddressId     String
-  shippingAddress       Address     @relation(fields: [shippingAddressId], references: [id])
-  
-  subTotal              Decimal     @db.Decimal(10, 2)
-  shippingCost          Decimal     @db.Decimal(10, 2)
-  totalAmount           Decimal     @db.Decimal(10, 2)
-  status                OrderStatus @default(PENDING)
+  id                String  @id @default(uuid())
+  orderNumber       String  @unique // E.g., #45897
+  userId            String
+  user              User    @relation(fields: [userId], references: [id])
+  shippingAddressId String
+  shippingAddress   Address @relation(fields: [shippingAddressId], references: [id])
+
+  subTotal     Decimal     @db.Decimal(10, 2)
+  shippingCost Decimal     @db.Decimal(10, 2)
+  totalAmount  Decimal     @db.Decimal(10, 2)
+  status       OrderStatus @default(PENDING)
 
   // Stripe Specific Fields
-  stripeSessionId       String?     @unique // Checkout Session ID
-  stripePaymentIntentId String?     @unique // Payment Intent ID for Webhooks
+  stripeSessionId       String? @unique // Checkout Session ID
+  stripePaymentIntentId String? @unique // Payment Intent ID for Webhooks
 
-  items                 OrderItem[]
-  payments              Payment[]   
+  items    OrderItem[]
+  payments Payment[]
 
-  createdAt             DateTime    @default(now())
-  updatedAt             DateTime    @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@index([userId])
   @@index([stripePaymentIntentId])
 }
 
 model OrderItem {
-  id                   String   @id @default(uuid())
-  orderId              String
-  order                Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
-  productId            String
-  product              Product  @relation(fields: [productId], references: [id])
-  
-  quantity             Int
-  unitPrice            Decimal  @db.Decimal(10, 2)
-  
-  // Immutable snapshot of customization at the time of order
-  customizationDetails Json?    
+  id        String  @id @default(uuid())
+  orderId   String
+  order     Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  productId String
+  product   Product @relation(fields: [productId], references: [id])
 
-  createdAt            DateTime @default(now())
+  quantity  Int
+  unitPrice Decimal @db.Decimal(10, 2)
+
+  // Immutable snapshot of customization at the time of order
+  customizationDetails Json?
+
+  createdAt DateTime @default(now())
 
   @@index([orderId])
 }
@@ -315,34 +335,34 @@ enum PaymentMethodType {
 }
 
 model Payment {
-  id               String            @id @default(uuid())
-  orderId          String
-  order            Order             @relation(fields: [orderId], references: [id], onDelete: Cascade)
-  
-  amount           Decimal           @db.Decimal(10, 2)
-  currency         String            @default("USD")
-  status           PaymentStatus     @default(PENDING)
-  method           PaymentMethodType
-  
+  id      String @id @default(uuid())
+  orderId String
+  order   Order  @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  amount   Decimal           @db.Decimal(10, 2)
+  currency String            @default("USD")
+  status   PaymentStatus     @default(PENDING)
+  method   PaymentMethodType
+
   // Stripe Data
-  stripeChargeId   String?           @unique
-  rawStripeResponse Json?             // Storing raw webhook data for debugging/logging
-  
-  createdAt        DateTime          @default(now())
-  updatedAt        DateTime          @updatedAt
+  stripeChargeId    String? @unique
+  rawStripeResponse Json? // Storing raw webhook data for debugging/logging
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@index([orderId])
 }
 
 model Refund {
-  id              String   @id @default(uuid())
-  paymentId       String
-  stripeRefundId  String   @unique
-  amount          Decimal  @db.Decimal(10, 2)
-  reason          String?
-  status          String   // e.g., succeeded, pending, failed
-  
-  createdAt       DateTime @default(now())
+  id             String  @id @default(uuid())
+  paymentId      String
+  stripeRefundId String  @unique
+  amount         Decimal @db.Decimal(10, 2)
+  reason         String?
+  status         String // e.g., succeeded, pending, failed
+
+  createdAt DateTime @default(now())
 }
 
 // ==========================================
@@ -350,14 +370,14 @@ model Refund {
 // ==========================================
 
 model Review {
-  id        String   @id @default(uuid())
+  id        String  @id @default(uuid())
   productId String
-  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
   userId    String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  
-  rating    Int      // 1-5 scale
-  comment   String   @db.Text
+  user      User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  rating     Int // 1-5 scale
+  comment    String  @db.Text
   isApproved Boolean @default(true)
 
   createdAt DateTime @default(now())
@@ -366,7 +386,3 @@ model Review {
   @@index([productId])
   @@index([userId])
 }
-
-
-
-

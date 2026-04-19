@@ -1826,6 +1826,218 @@
                             ]
                         }
                     ]
+                },
+                {
+                    "name": "Pricing Rules",
+                    "description": "Admin endpoints for managing platform pricing rules (shipping cost, customization fees, etc.)",
+                    "item": [
+                        {
+                            "name": "Get All Pricing Rules",
+                            "request": {
+                                "method": "GET",
+                                "header": [
+                                    {
+                                        "key": "Content-Type",
+                                        "value": "application/json",
+                                        "type": "text"
+                                    }
+                                ],
+                                "url": {
+                                    "raw": "{{base_url}}/api/admin/pricing-rules",
+                                    "host": [
+                                        "{{base_url}}"
+                                    ],
+                                    "path": [
+                                        "api",
+                                        "admin",
+                                        "pricing-rules"
+                                    ]
+                                },
+                                "description": "Get all pricing rules (public endpoint)"
+                            },
+                            "response": [
+                                {
+                                    "name": "Success Response (200)",
+                                    "originalRequest": {
+                                        "method": "GET",
+                                        "header": [],
+                                        "url": {
+                                            "raw": "{{base_url}}/api/admin/pricing-rules",
+                                            "host": [
+                                                "{{base_url}}"
+                                            ],
+                                            "path": [
+                                                "api",
+                                                "admin",
+                                                "pricing-rules"
+                                            ]
+                                        }
+                                    },
+                                    "status": "OK",
+                                    "code": 200,
+                                    "body": "{\n  \"success\": true,\n  \"data\": [\n    {\n      \"id\": \"rule-1\",\n      \"name\": \"Shipping cost\",\n      \"type\": \"FIXED\",\n      \"value\": \"15.98\",\n      \"description\": \"Shipping cost for all products\",\n      \"createdAt\": \"2024-01-01T00:00:00Z\",\n      \"updatedAt\": \"2024-01-01T00:00:00Z\"\n    },\n    {\n      \"id\": \"rule-2\",\n      \"name\": \"Customization Fee\",\n      \"type\": \"FIXED\",\n      \"value\": \"8.00\",\n      \"description\": \"Additional fee for customization\",\n      \"createdAt\": \"2024-01-01T00:00:00Z\",\n      \"updatedAt\": \"2024-01-01T00:00:00Z\"\n    },\n    {\n      \"id\": \"rule-3\",\n      \"name\": \"Printing Fee\",\n      \"type\": \"PERCENTAGE\",\n      \"value\": \"15\",\n      \"description\": \"Printing fee percentage\",\n      \"createdAt\": \"2024-01-01T00:00:00Z\",\n      \"updatedAt\": \"2024-01-01T00:00:00Z\"\n    }\n  ],\n  \"count\": 3\n}"
+                                }
+                            ]
+                        },
+                        {
+                            "name": "Get Pricing Rule by ID",
+                            "request": {
+                                "method": "GET",
+                                "header": [
+                                    {
+                                        "key": "Content-Type",
+                                        "value": "application/json",
+                                        "type": "text"
+                                    }
+                                ],
+                                "url": {
+                                    "raw": "{{base_url}}/api/admin/pricing-rules/{{pricingRuleId}}",
+                                    "host": [
+                                        "{{base_url}}"
+                                    ],
+                                    "path": [
+                                        "api",
+                                        "admin",
+                                        "pricing-rules",
+                                        "{{pricingRuleId}}"
+                                    ]
+                                },
+                                "description": "Get a single pricing rule by ID"
+                            },
+                            "response": [
+                                {
+                                    "name": "Success Response (200)",
+                                    "status": "OK",
+                                    "code": 200,
+                                    "body": "{\n  \"success\": true,\n  \"data\": {\n    \"id\": \"rule-1\",\n    \"name\": \"Shipping cost\",\n    \"type\": \"FIXED\",\n    \"value\": \"15.98\",\n    \"description\": \"Shipping cost for all products\",\n    \"createdAt\": \"2024-01-01T00:00:00Z\",\n    \"updatedAt\": \"2024-01-01T00:00:00Z\"\n  }\n}"
+                                }
+                            ]
+                        },
+                        {
+                            "name": "Create Pricing Rule",
+                            "request": {
+                                "method": "POST",
+                                "header": [
+                                    {
+                                        "key": "Content-Type",
+                                        "value": "application/json",
+                                        "type": "text"
+                                    },
+                                    {
+                                        "key": "Authorization",
+                                        "value": "Bearer {{adminToken}}",
+                                        "type": "text"
+                                    }
+                                ],
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": "{\n  \"name\": \"Shipping cost\",\n  \"type\": \"FIXED\",\n  \"value\": \"15.98\",\n  \"description\": \"Shipping cost for all products\"\n}"
+                                },
+                                "url": {
+                                    "raw": "{{base_url}}/api/admin/pricing-rules",
+                                    "host": [
+                                        "{{base_url}}"
+                                    ],
+                                    "path": [
+                                        "api",
+                                        "admin",
+                                        "pricing-rules"
+                                    ]
+                                },
+                                "description": "Create a new pricing rule (admin only)\n\nBody parameters:\n- name (string): Name of the pricing rule (must be unique)\n- type (enum): FIXED or PERCENTAGE\n- value (number): The amount or percentage value\n- description (string, optional): Description of the rule"
+                            },
+                            "response": [
+                                {
+                                    "name": "Success Response (201)",
+                                    "status": "Created",
+                                    "code": 201,
+                                    "body": "{\n  \"success\": true,\n  \"message\": \"Pricing rule created successfully\",\n  \"data\": {\n    \"id\": \"new-rule-id\",\n    \"name\": \"Shipping cost\",\n    \"type\": \"FIXED\",\n    \"value\": \"15.98\",\n    \"description\": \"Shipping cost for all products\",\n    \"createdAt\": \"2024-01-15T10:30:00Z\",\n    \"updatedAt\": \"2024-01-15T10:30:00Z\"\n  }\n}"
+                                }
+                            ]
+                        },
+                        {
+                            "name": "Update Pricing Rule",
+                            "request": {
+                                "method": "PUT",
+                                "header": [
+                                    {
+                                        "key": "Content-Type",
+                                        "value": "application/json",
+                                        "type": "text"
+                                    },
+                                    {
+                                        "key": "Authorization",
+                                        "value": "Bearer {{adminToken}}",
+                                        "type": "text"
+                                    }
+                                ],
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": "{\n  \"name\": \"Shipping cost\",\n  \"type\": \"FIXED\",\n  \"value\": \"18.99\",\n  \"description\": \"Updated shipping cost for all products\"\n}"
+                                },
+                                "url": {
+                                    "raw": "{{base_url}}/api/admin/pricing-rules/{{pricingRuleId}}",
+                                    "host": [
+                                        "{{base_url}}"
+                                    ],
+                                    "path": [
+                                        "api",
+                                        "admin",
+                                        "pricing-rules",
+                                        "{{pricingRuleId}}"
+                                    ]
+                                },
+                                "description": "Update an existing pricing rule (admin only)"
+                            },
+                            "response": [
+                                {
+                                    "name": "Success Response (200)",
+                                    "status": "OK",
+                                    "code": 200,
+                                    "body": "{\n  \"success\": true,\n  \"message\": \"Pricing rule updated successfully\",\n  \"data\": {\n    \"id\": \"rule-1\",\n    \"name\": \"Shipping cost\",\n    \"type\": \"FIXED\",\n    \"value\": \"18.99\",\n    \"description\": \"Updated shipping cost for all products\",\n    \"createdAt\": \"2024-01-01T00:00:00Z\",\n    \"updatedAt\": \"2024-01-15T10:35:00Z\"\n  }\n}"
+                                }
+                            ]
+                        },
+                        {
+                            "name": "Delete Pricing Rule",
+                            "request": {
+                                "method": "DELETE",
+                                "header": [
+                                    {
+                                        "key": "Content-Type",
+                                        "value": "application/json",
+                                        "type": "text"
+                                    },
+                                    {
+                                        "key": "Authorization",
+                                        "value": "Bearer {{adminToken}}",
+                                        "type": "text"
+                                    }
+                                ],
+                                "url": {
+                                    "raw": "{{base_url}}/api/admin/pricing-rules/{{pricingRuleId}}",
+                                    "host": [
+                                        "{{base_url}}"
+                                    ],
+                                    "path": [
+                                        "api",
+                                        "admin",
+                                        "pricing-rules",
+                                        "{{pricingRuleId}}"
+                                    ]
+                                },
+                                "description": "Delete a pricing rule (admin only)"
+                            },
+                            "response": [
+                                {
+                                    "name": "Success Response (200)",
+                                    "status": "OK",
+                                    "code": 200,
+                                    "body": "{\n  \"success\": true,\n  \"message\": \"Pricing rule deleted successfully\"\n}"
+                                }
+                            ]
+                        }
+                    ]
                 }
             ]
         }
@@ -1848,6 +2060,11 @@
         },
         {
             "key": "subcategoryId",
+            "value": "",
+            "type": "string"
+        },
+        {
+            "key": "pricingRuleId",
             "value": "",
             "type": "string"
         },
