@@ -6,15 +6,28 @@ const prisma = require('../utils/prisma');
  */
 class AdminPricingRulesService {
   /**
-   * Get all pricing rules
-   * @returns {Promise<Array>} List of all pricing rules
+   * Get all pricing rules with pagination
+   * @param {number} offset - Number of records to skip (default: 0)
+   * @param {number} limit - Number of records to return (default: 10)
+   * @returns {Promise<Object>} List of pricing rules with total count
    */
-  async getAllPricingRules() {
+  async getAllPricingRules(offset = 0, limit = 10) {
     try {
       const rules = await prisma.pricingRule.findMany({
-        orderBy: { createdAt: 'desc' }
+        orderBy: { createdAt: 'desc' },
+        skip: offset,
+        take: limit
       });
-      return rules;
+
+      const total = await prisma.pricingRule.count();
+
+      return {
+        data: rules,
+        total,
+        offset,
+        limit,
+        hasMore: offset + limit < total
+      };
     } catch (error) {
       throw new Error(`Failed to fetch pricing rules: ${error.message}`);
     }

@@ -17,15 +17,28 @@ const prisma = new PrismaClient({
  */
 class AdminServicesService {
   /**
-   * Get all services
-   * @returns {Promise<Array>} List of services
+   * Get all services with pagination
+   * @param {number} offset - Number of records to skip (default: 0)
+   * @param {number} limit - Number of records to return (default: 10)
+   * @returns {Promise<Object>} List of services with total count
    */
-  async getAllServices() {
+  async getAllServices(offset = 0, limit = 10) {
     try {
       const services = await prisma.service.findMany({
-        orderBy: { createdAt: 'desc' }
+        orderBy: { createdAt: 'desc' },
+        skip: offset,
+        take: limit
       });
-      return services;
+
+      const total = await prisma.service.count();
+
+      return {
+        data: services,
+        total,
+        offset,
+        limit,
+        hasMore: offset + limit < total
+      };
     } catch (error) {
       throw new Error(`Failed to fetch services: ${error.message}`);
     }

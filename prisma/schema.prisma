@@ -112,6 +112,7 @@ model Category {
 
   subcategories Subcategory[]
   products      Product[]
+  materials     Material[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -232,6 +233,22 @@ model PricingRule {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+// ==========================================
+// Materials Management
+// ==========================================
+
+model Material {
+  id         String   @id @default(uuid())
+  name       String   @unique
+  categoryId String
+  category   Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([categoryId])
 }
 
 // ==========================================

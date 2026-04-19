@@ -7,16 +7,24 @@ const adminServicesService = require('../services/adminServices.service');
 class AdminServicesController {
   /**
    * Get all services
-   * @route GET /api/admin/services
+   * @route GET /api/admin/services?offset=0&limit=10
    */
   async getAllServices(req, res, next) {
     try {
-      const services = await adminServicesService.getAllServices();
+      const offset = Math.max(0, parseInt(req.query.offset) || 0);
+      const limit = Math.max(1, Math.min(100, parseInt(req.query.limit) || 10));
+
+      const result = await adminServicesService.getAllServices(offset, limit);
 
       res.status(200).json({
         success: true,
-        data: services,
-        count: services.length
+        data: result.data,
+        pagination: {
+          offset: result.offset,
+          limit: result.limit,
+          total: result.total,
+          hasMore: result.hasMore
+        }
       });
     } catch (error) {
       res.status(400).json({

@@ -1,20 +1,20 @@
-const adminPricingRulesService = require('../services/adminPricingRules.service');
+const adminMaterialsService = require('../services/adminMaterials.service');
 
 /**
- * Admin Pricing Rules Controller
- * Handles HTTP requests for pricing rule management
+ * Admin Materials Controller
+ * Handles HTTP requests for material management
  */
-class AdminPricingRulesController {
+class AdminMaterialsController {
   /**
-   * Get all pricing rules
-   * @route GET /api/admin/pricing-rules?offset=0&limit=10
+   * Get all materials
+   * @route GET /api/admin/materials?offset=0&limit=10
    */
-  async getAllPricingRules(req, res, next) {
+  async getAllMaterials(req, res, next) {
     try {
       const offset = Math.max(0, parseInt(req.query.offset) || 0);
       const limit = Math.max(1, Math.min(100, parseInt(req.query.limit) || 10));
 
-      const result = await adminPricingRulesService.getAllPricingRules(offset, limit);
+      const result = await adminMaterialsService.getAllMaterials(offset, limit);
 
       res.status(200).json({
         success: true,
@@ -35,17 +35,39 @@ class AdminPricingRulesController {
   }
 
   /**
-   * Get single pricing rule by ID
-   * @route GET /api/admin/pricing-rules/:id
+   * Get materials by category ID
+   * @route GET /api/admin/materials/category/:categoryId
    */
-  async getPricingRuleById(req, res, next) {
+  async getMaterialsByCategoryId(req, res, next) {
     try {
-      const { id } = req.params;
-      const rule = await adminPricingRulesService.getPricingRuleById(id);
+      const { categoryId } = req.params;
+      const materials = await adminMaterialsService.getMaterialsByCategoryId(categoryId);
 
       res.status(200).json({
         success: true,
-        data: rule
+        data: materials,
+        count: materials.length
+      });
+    } catch (error) {
+      res.status(400).json({
+        success: false,
+        error: error.message
+      });
+    }
+  }
+
+  /**
+   * Get single material by ID
+   * @route GET /api/admin/materials/:id
+   */
+  async getMaterialById(req, res, next) {
+    try {
+      const { id } = req.params;
+      const material = await adminMaterialsService.getMaterialById(id);
+
+      res.status(200).json({
+        success: true,
+        data: material
       });
     } catch (error) {
       const statusCode = error.message.includes('not found') ? 404 : 400;
@@ -57,46 +79,37 @@ class AdminPricingRulesController {
   }
 
   /**
-   * Create new pricing rule
-   * @route POST /api/admin/pricing-rules
-   * @body {name, type, value, description}
+   * Create new material
+   * @route POST /api/admin/materials
+   * @body {name, categoryId}
    */
-  async createPricingRule(req, res, next) {
+  async createMaterial(req, res, next) {
     try {
-      const { name, type, value, description } = req.body;
+      const { name, categoryId } = req.body;
 
       if (!name || name.trim() === '') {
         return res.status(400).json({
           success: false,
-          error: 'Rule name is required'
+          error: 'Material name is required'
         });
       }
 
-      if (!type || !['FIXED', 'PERCENTAGE'].includes(type)) {
+      if (!categoryId || categoryId.trim() === '') {
         return res.status(400).json({
           success: false,
-          error: 'Type is required and must be either FIXED or PERCENTAGE'
+          error: 'categoryId is required'
         });
       }
 
-      if (value === undefined || value === null) {
-        return res.status(400).json({
-          success: false,
-          error: 'Value is required'
-        });
-      }
-
-      const rule = await adminPricingRulesService.createPricingRule({
+      const material = await adminMaterialsService.createMaterial({
         name: name.trim(),
-        type,
-        value,
-        description: description || null
+        categoryId: categoryId.trim()
       });
 
       res.status(201).json({
         success: true,
-        message: 'Pricing rule created successfully',
-        data: rule
+        message: 'Material created successfully',
+        data: material
       });
     } catch (error) {
       const statusCode = error.message.includes('already exists') ? 409 : 400;
@@ -108,26 +121,24 @@ class AdminPricingRulesController {
   }
 
   /**
-   * Update pricing rule
-   * @route PUT /api/admin/pricing-rules/:id
-   * @body {name, type, value, description}
+   * Update material
+   * @route PUT /api/admin/materials/:id
+   * @body {name, categoryId}
    */
-  async updatePricingRule(req, res, next) {
+  async updateMaterial(req, res, next) {
     try {
       const { id } = req.params;
-      const { name, type, value, description } = req.body;
+      const { name, categoryId } = req.body;
 
-      const rule = await adminPricingRulesService.updatePricingRule(id, {
+      const material = await adminMaterialsService.updateMaterial(id, {
         name,
-        type,
-        value,
-        description
+        categoryId
       });
 
       res.status(200).json({
         success: true,
-        message: 'Pricing rule updated successfully',
-        data: rule
+        message: 'Material updated successfully',
+        data: material
       });
     } catch (error) {
       const statusCode = error.message.includes('not found') ? 404 : 
@@ -140,14 +151,14 @@ class AdminPricingRulesController {
   }
 
   /**
-   * Delete pricing rule
-   * @route DELETE /api/admin/pricing-rules/:id
+   * Delete material
+   * @route DELETE /api/admin/materials/:id
    */
-  async deletePricingRule(req, res, next) {
+  async deleteMaterial(req, res, next) {
     try {
       const { id } = req.params;
 
-      const result = await adminPricingRulesService.deletePricingRule(id);
+      const result = await adminMaterialsService.deleteMaterial(id);
 
       res.status(200).json({
         success: true,
@@ -163,4 +174,4 @@ class AdminPricingRulesController {
   }
 }
 
-module.exports = new AdminPricingRulesController();
+module.exports = new AdminMaterialsController();
