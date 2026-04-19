@@ -2621,6 +2621,287 @@
                             ]
                         }
                     ]
+                },
+                {
+                    "name": "Orders",
+                    "description": "Admin endpoints for managing orders",
+                    "item": [
+                        {
+                            "name": "Get Order Statistics",
+                            "request": {
+                                "method": "GET",
+                                "header": [
+                                    {
+                                        "key": "Content-Type",
+                                        "value": "application/json",
+                                        "type": "text"
+                                    },
+                                    {
+                                        "key": "Authorization",
+                                        "value": "Bearer {{adminToken}}",
+                                        "type": "text"
+                                    }
+                                ],
+                                "url": {
+                                    "raw": "{{base_url}}/api/admin/orders/stats",
+                                    "host": [
+                                        "{{base_url}}"
+                                    ],
+                                    "path": [
+                                        "api",
+                                        "admin",
+                                        "orders",
+                                        "stats"
+                                    ]
+                                },
+                                "description": "Get order statistics (total, pending, processing, completed)"
+                            },
+                            "response": [
+                                {
+                                    "name": "Success Response (200)",
+                                    "status": "OK",
+                                    "code": 200,
+                                    "body": "{\n  \"success\": true,\n  \"data\": {\n    \"total\": 8,\n    \"pending\": 2,\n    \"processing\": 3,\n    \"completed\": 2\n  }\n}"
+                                }
+                            ]
+                        },
+                        {
+                            "name": "Get All Order Statuses",
+                            "request": {
+                                "method": "GET",
+                                "header": [
+                                    {
+                                        "key": "Content-Type",
+                                        "value": "application/json",
+                                        "type": "text"
+                                    },
+                                    {
+                                        "key": "Authorization",
+                                        "value": "Bearer {{adminToken}}",
+                                        "type": "text"
+                                    }
+                                ],
+                                "url": {
+                                    "raw": "{{base_url}}/api/admin/orders/statuses",
+                                    "host": [
+                                        "{{base_url}}"
+                                    ],
+                                    "path": [
+                                        "api",
+                                        "admin",
+                                        "orders",
+                                        "statuses"
+                                    ]
+                                },
+                                "description": "Get all available order statuses with labels, descriptions, and color codes"
+                            },
+                            "response": [
+                                {
+                                    "name": "Success Response (200)",
+                                    "status": "OK",
+                                    "code": 200,
+                                    "body": "{\n  \"success\": true,\n  \"data\": [\n    {\n      \"value\": \"PENDING\",\n      \"label\": \"Pending\",\n      \"description\": \"Order is awaiting processing\",\n      \"color\": \"#FFA500\"\n    },\n    {\n      \"value\": \"PROCESSING\",\n      \"label\": \"Processing\",\n      \"description\": \"Order is being processed\",\n      \"color\": \"#4169E1\"\n    },\n    {\n      \"value\": \"COMPLETED\",\n      \"label\": \"Completed\",\n      \"description\": \"Order has been completed\",\n      \"color\": \"#32CD32\"\n    },\n    {\n      \"value\": \"CANCELLED\",\n      \"label\": \"Cancelled\",\n      \"description\": \"Order has been cancelled\",\n      \"color\": \"#DC143C\"\n    }\n  ]\n}"
+                                }
+                            ]
+                        },
+                        {
+                            "name": "Get All Orders",
+                            "event": [
+                                {
+                                    "listen": "test",
+                                    "script": {
+                                        "exec": [
+                                            "if (pm.response.code === 200) {",
+                                            "    const jsonData = pm.response.json();",
+                                            "    if (jsonData.data && jsonData.data.length > 0) {",
+                                            "        pm.environment.set('orderId', jsonData.data[0].id);",
+                                            "    }",
+                                            "}"
+                                        ],
+                                        "type": "text/javascript"
+                                    }
+                                }
+                            ],
+                            "request": {
+                                "method": "GET",
+                                "header": [
+                                    {
+                                        "key": "Content-Type",
+                                        "value": "application/json",
+                                        "type": "text"
+                                    },
+                                    {
+                                        "key": "Authorization",
+                                        "value": "Bearer {{adminToken}}",
+                                        "type": "text"
+                                    }
+                                ],
+                                "url": {
+                                    "raw": "{{base_url}}/api/admin/orders?page=1&limit=10&status=ALL&serviceId=ALL",
+                                    "host": [
+                                        "{{base_url}}"
+                                    ],
+                                    "path": [
+                                        "api",
+                                        "admin",
+                                        "orders"
+                                    ],
+                                    "query": [
+                                        {
+                                            "key": "page",
+                                            "value": "1",
+                                            "disabled": false
+                                        },
+                                        {
+                                            "key": "limit",
+                                            "value": "10",
+                                            "disabled": false
+                                        },
+                                        {
+                                            "key": "status",
+                                            "value": "ALL",
+                                            "disabled": false,
+                                            "description": "Filter by status: ALL, PENDING, PROCESSING, COMPLETED, CANCELLED"
+                                        },
+                                        {
+                                            "key": "serviceId",
+                                            "value": "ALL",
+                                            "disabled": false,
+                                            "description": "Filter by service: ALL or specific serviceId"
+                                        }
+                                    ]
+                                },
+                                "description": "Get all orders with pagination and filters (admin only)\\n\\nQuery parameters:\\n- page (number): Page number (default: 1, min: 1)\\n- limit (number): Records to return (default: 10, max: 100)\\n- status (string): Filter by status (ALL, PENDING, PROCESSING, COMPLETED, CANCELLED)\\n- serviceId (string): Filter by service (ALL or specific serviceId)"
+                            },
+                            "response": [
+                                {
+                                    "name": "Success Response (200)",
+                                    "status": "OK",
+                                    "code": 200,
+                                    "body": "{\n  \"success\": true,\n  \"data\": [\n    {\n      \"id\": \"order-1\",\n      \"orderNumber\": \"ORD-1234\",\n      \"customer\": {\n        \"name\": \"John Doe\",\n        \"email\": \"john.doe@example.com\"\n      },\n      \"service\": \"Apparel Printing\",\n      \"product\": {\n        \"name\": \"Premium Cotton T-Shirt\",\n        \"quantity\": 3\n      },\n      \"method\": \"DTG\",\n      \"status\": \"PROCESSING\",\n      \"paymentStatus\": \"SUCCESS\",\n      \"totalAmount\": 125.00,\n      \"createdAt\": \"2026-03-26T14:32:15Z\",\n      \"updatedAt\": \"2026-03-26T14:32:15Z\"\n    }\n  ],\n  \"pagination\": {\n    \"page\": 1,\n    \"limit\": 10,\n    \"total\": 8,\n    \"hasMore\": false\n  }\n}"
+                                }
+                            ]
+                        },
+                        {
+                            "name": "Get Order by ID",
+                            "request": {
+                                "method": "GET",
+                                "header": [
+                                    {
+                                        "key": "Content-Type",
+                                        "value": "application/json",
+                                        "type": "text"
+                                    },
+                                    {
+                                        "key": "Authorization",
+                                        "value": "Bearer {{adminToken}}",
+                                        "type": "text"
+                                    }
+                                ],
+                                "url": {
+                                    "raw": "{{base_url}}/api/admin/orders/{{orderId}}",
+                                    "host": [
+                                        "{{base_url}}"
+                                    ],
+                                    "path": [
+                                        "api",
+                                        "admin",
+                                        "orders",
+                                        "{{orderId}}"
+                                    ]
+                                },
+                                "description": "Get detailed information for a specific order (admin only)"
+                            },
+                            "response": [
+                                {
+                                    "name": "Success Response (200)",
+                                    "status": "OK",
+                                    "code": 200,
+                                    "body": "{\n  \"success\": true,\n  \"data\": {\n    \"id\": \"order-1\",\n    \"orderNumber\": \"ORD-1234\",\n    \"status\": \"PROCESSING\",\n    \"paymentStatus\": \"PAID\",\n    \"totalAmount\": 125.00,\n    \"placedAt\": \"2026-03-26T14:32:15Z\",\n    \"product\": {\n      \"service\": \"Apparel Printing\",\n      \"category\": \"T-Shirts\",\n      \"productName\": \"Premium Cotton T-Shirt\",\n      \"quantity\": 3\n    },\n    \"customer\": {\n      \"name\": \"John Doe\",\n      \"email\": \"john.doe@example.com\",\n      \"phone\": \"+1 (555) 123-4567\"\n    },\n    \"delivery\": {\n      \"street\": \"123 Main Street, Apt 4B\",\n      \"city\": \"New York\",\n      \"state\": \"NY\",\n      \"zipCode\": \"10001\",\n      \"company\": null\n    },\n    \"pricing\": {\n      \"basePrice\": 15.99,\n      \"customization\": 8.00,\n      \"printing\": 12.50,\n      \"shipping\": 10.00,\n      \"tax\": 4.65,\n      \"total\": 125.00\n    },\n    \"customizationDetails\": {\n      \"basics\": {\n        \"fabric\": \"100% Premium Cotton\"\n      },\n      \"printing\": {\n        \"method\": \"DTG (Direct to Garment)\",\n        \"location\": \"Front Center\",\n        \"printSize\": \"Small\",\n        \"colors\": \"Full Color CMYK\"\n      },\n      \"design\": {\n        \"uploadedLogo\": {\n          \"fileName\": \"company-logo-2024.png\",\n          \"filePath\": \"/uploads/orders/order-1/company-logo-2024.png\"\n        },\n        \"customText\": \"ACME Corporation\\nBuilding Tomorrow, Today\",\n        \"designFile\": {\n          \"fileName\": \"custom-design-v3.ai\",\n          \"filePath\": \"/uploads/orders/order-1/custom-design-v3.ai\"\n        }\n      },\n      \"material\": {\n        \"type\": \"100% Premium Cotton\"\n      },\n      \"specialInstructions\": \"Customer requested rush delivery. Logo should be placed 3 inches from collar.\"\n    }\n  }\n}"
+                                }
+                            ]
+                        },
+                        {
+                            "name": "Update Order Status",
+                            "request": {
+                                "method": "PUT",
+                                "header": [
+                                    {
+                                        "key": "Content-Type",
+                                        "value": "application/json",
+                                        "type": "text"
+                                    },
+                                    {
+                                        "key": "Authorization",
+                                        "value": "Bearer {{adminToken}}",
+                                        "type": "text"
+                                    }
+                                ],
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": "{\n  \"status\": \"COMPLETED\"\n}"
+                                },
+                                "url": {
+                                    "raw": "{{base_url}}/api/admin/orders/{{orderId}}/status",
+                                    "host": [
+                                        "{{base_url}}"
+                                    ],
+                                    "path": [
+                                        "api",
+                                        "admin",
+                                        "orders",
+                                        "{{orderId}}",
+                                        "status"
+                                    ]
+                                },
+                                "description": "Update order status (admin only)\\n\\nAvailable statuses: PENDING, PROCESSING, COMPLETED, CANCELLED"
+                            },
+                            "response": [
+                                {
+                                    "name": "Success Response (200)",
+                                    "status": "OK",
+                                    "code": 200,
+                                    "body": "{\n  \"success\": true,\n  \"message\": \"Order status updated successfully\",\n  \"data\": {\n    \"id\": \"order-1\",\n    \"orderNumber\": \"ORD-1234\",\n    \"status\": \"COMPLETED\",\n    \"updatedAt\": \"2026-04-19T10:30:00Z\"\n  }\n}"
+                                }
+                            ]
+                        },
+                        {
+                            "name": "Download Order File",
+                            "request": {
+                                "method": "GET",
+                                "header": [
+                                    {
+                                        "key": "Authorization",
+                                        "value": "Bearer {{adminToken}}",
+                                        "type": "text"
+                                    }
+                                ],
+                                "url": {
+                                    "raw": "{{base_url}}/api/admin/orders/{{orderId}}/files/company-logo-2024.png",
+                                    "host": [
+                                        "{{base_url}}"
+                                    ],
+                                    "path": [
+                                        "api",
+                                        "admin",
+                                        "orders",
+                                        "{{orderId}}",
+                                        "files",
+                                        "company-logo-2024.png"
+                                    ]
+                                },
+                                "description": "Download uploaded files from order customization (logo, design files) (admin only)"
+                            },
+                            "response": [
+                                {
+                                    "name": "Success Response (200)",
+                                    "status": "OK",
+                                    "code": 200,
+                                    "body": "<binary file download>"
+                                }
+                            ]
+                        }
+                    ]
                 }
             ]
         }
@@ -2658,6 +2939,11 @@
         },
         {
             "key": "printingMethodId",
+            "value": "",
+            "type": "string"
+        },
+        {
+            "key": "orderId",
             "value": "",
             "type": "string"
         },
