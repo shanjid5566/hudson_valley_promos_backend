@@ -152,8 +152,11 @@ model Product {
   images        String[] // Array of image URLs
   isFeatured    Boolean      @default(false)
 
+  // Product variants (colors, sizes, materials, etc.)
+  // Example: { colors: [{value: "Red", hex: "#FF0000", extraCost: 0}], sizes: [{value: "XL", extraCost: 1}] }
+  variants Json?
+
   pricingTiers PricingTier[]
-  attributes   ProductAttribute[]
   reviews      Review[]
   cartItems    CartItem[]
   orderItems   OrderItem[]
@@ -174,45 +177,6 @@ model PricingTier {
   unitPrice   Decimal @db.Decimal(10, 2)
 
   @@index([productId])
-}
-
-// ==========================================
-// Dynamic Product Customization
-// ==========================================
-
-enum AttributeType {
-  COLOR_SWATCH
-  RADIO_BUTTON
-  DROPDOWN
-  TEXT_INPUT
-  FILE_UPLOAD
-}
-
-// e.g., "Print Method", "Color Options", "Size Options"
-model ProductAttribute {
-  id         String        @id @default(uuid())
-  productId  String
-  product    Product       @relation(fields: [productId], references: [id], onDelete: Cascade)
-  name       String
-  type       AttributeType
-  isRequired Boolean       @default(true)
-  order      Int           @default(0) // For UI sorting
-
-  options AttributeOption[]
-
-  @@index([productId])
-}
-
-// e.g., "Screen Printing", "Red", "Large"
-model AttributeOption {
-  id          String           @id @default(uuid())
-  attributeId String
-  attribute   ProductAttribute @relation(fields: [attributeId], references: [id], onDelete: Cascade)
-  value       String
-  metaValue   String? // Hex code for colors, etc.
-  extraCost   Decimal          @default(0.00) @db.Decimal(10, 2)
-
-  @@index([attributeId])
 }
 
 // ==========================================
