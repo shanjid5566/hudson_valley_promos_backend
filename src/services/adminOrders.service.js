@@ -9,7 +9,7 @@ class AdminOrdersService {
    * Get all orders with pagination and filters
    * @param {number} page - Page number (default: 1)
    * @param {number} limit - Number of records to return (default: 10)
-   * @param {object} filters - Filters for status, serviceId, method
+   * @param {object} filters - Filters for status, serviceId, method, search
    * @returns {Promise<Object>} List of orders with total count
    */
   async getAllOrders(page = 1, limit = 10, filters = {}) {
@@ -33,6 +33,49 @@ class AdminOrdersService {
             }
           }
         };
+      }
+
+      // Search by OrderId, Customer name, or Email
+      if (filters.search && filters.search.trim()) {
+        const searchTerm = filters.search.trim().toLowerCase();
+        where.OR = [
+          {
+            orderNumber: {
+              contains: searchTerm,
+              mode: 'insensitive'
+            }
+          },
+          {
+            id: {
+              contains: searchTerm,
+              mode: 'insensitive'
+            }
+          },
+          {
+            user: {
+              OR: [
+                {
+                  firstName: {
+                    contains: searchTerm,
+                    mode: 'insensitive'
+                  }
+                },
+                {
+                  lastName: {
+                    contains: searchTerm,
+                    mode: 'insensitive'
+                  }
+                },
+                {
+                  email: {
+                    contains: searchTerm,
+                    mode: 'insensitive'
+                  }
+                }
+              ]
+            }
+          }
+        ];
       }
 
       const orders = await prisma.order.findMany({

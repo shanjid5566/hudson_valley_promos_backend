@@ -1353,7 +1353,7 @@
                   }
                 ],
                 "url": {
-                  "raw": "{{base_url}}/api/admin/orders?page=1&limit=10&status=ALL&serviceId=ALL&method=ALL",
+                  "raw": "{{base_url}}/api/admin/orders?page=1&limit=10&status=ALL&serviceId=ALL&method=ALL&search=",
                   "host": [
                     "{{base_url}}"
                   ],
@@ -1382,6 +1382,11 @@
                     {
                       "key": "method",
                       "value": "ALL"
+                    },
+                    {
+                      "key": "search",
+                      "value": "",
+                      "description": "Search by OrderId, Customer Name, or Email"
                     }
                   ]
                 }

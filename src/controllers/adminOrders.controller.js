@@ -9,7 +9,7 @@ const fs = require('fs').promises;
 class AdminOrdersController {
   /**
    * Get all orders with pagination and filters
-   * @route GET /api/admin/orders?page=1&limit=10&status=PROCESSING&serviceId=xxx
+   * @route GET /api/admin/orders?page=1&limit=10&status=PROCESSING&serviceId=xxx&search=orderid|customername|email
    */
   async getAllOrders(req, res, next) {
     try {
@@ -19,7 +19,8 @@ class AdminOrdersController {
       const filters = {
         status: req.query.status || 'ALL',
         serviceId: req.query.serviceId || 'ALL',
-        method: req.query.method || 'ALL'
+        method: req.query.method || 'ALL',
+        search: req.query.search || ''
       };
 
       const result = await adminOrdersService.getAllOrders(page, limit, filters);
