@@ -74,10 +74,20 @@ class UserController {
   /**
    * Get single user by ID
    * @route GET /api/users/:id
+   * Authorization: Regular users can only access their own profile, admins can access any profile
    */
   async getUserById(req, res, next) {
     try {
       const { id } = req.params;
+      
+      // Check authorization: regular users can only access their own profile
+      if (req.user.role !== 'ADMIN' && req.user.id !== id) {
+        return res.status(403).json({
+          success: false,
+          error: 'You do not have permission to view this user profile'
+        });
+      }
+      
       const user = await userService.getUserById(id);
       
       if (!user) {
