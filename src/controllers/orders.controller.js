@@ -1,4 +1,4 @@
-const adminOrdersService = require('../services/adminOrders.service');
+const adminOrdersService = require('../services/orders.service');
 const path = require('path');
 const fs = require('fs').promises;
 

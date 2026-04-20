@@ -1,4 +1,4 @@
-const adminAttributesService = require('../services/adminAttributes.service');
+const adminAttributesService = require('../services/attributes.service');
 
 class AdminAttributesController {
   async getAllAttributes(req, res) {

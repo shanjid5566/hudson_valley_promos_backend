@@ -1,4 +1,4 @@
-const adminPricingRulesService = require('../services/adminPricingRules.service');
+const adminPricingRulesService = require('../services/pricingRules.service');
 
 /**
  * Admin Pricing Rules Controller

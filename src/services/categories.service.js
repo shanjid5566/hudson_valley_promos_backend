@@ -19,7 +19,7 @@ class AdminCategoriesService {
   /**
    * Get all categories
    * @param {string} serviceId - Optional filter by service ID
-   * @returns {Promise<Array>} List of categories
+   * @returns {Promise<Array>} List of categories with subcategories
    */
   async getAllCategories(serviceId = null) {
     try {
@@ -27,6 +27,16 @@ class AdminCategoriesService {
 
       const categories = await prisma.category.findMany({
         where,
+        include: {
+          subcategories: {
+            select: {
+              id: true,
+              name: true,
+              slug: true,
+              description: true
+            }
+          }
+        },
         orderBy: { createdAt: 'desc' }
       });
 

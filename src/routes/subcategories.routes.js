@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const adminSubcategoriesController = require('../controllers/adminSubcategories.controller');
+const adminSubcategoriesController = require('../controllers/subcategories.controller');
 const { verifyAdminToken } = require('../middleware/admin.middleware');
 
 /**

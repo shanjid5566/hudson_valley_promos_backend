@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const adminAttributesController = require('../controllers/adminAttributes.controller');
+const adminAttributesController = require('../controllers/attributes.controller');
 const { verifyAdminToken } = require('../middleware/admin.middleware');
 
 // GET all attributes with their options

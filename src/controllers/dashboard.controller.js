@@ -1,4 +1,4 @@
-const adminDashboardService = require('../services/adminDashboard.service');
+const adminDashboardService = require('../services/dashboard.service');
 
 /**
  * Admin Dashboard Controller

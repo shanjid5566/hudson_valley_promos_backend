@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const adminPricingRulesController = require('../controllers/adminPricingRules.controller');
+const adminPricingRulesController = require('../controllers/pricingRules.controller');
 const { verifyAdminToken } = require('../middleware/admin.middleware');
 
 /**

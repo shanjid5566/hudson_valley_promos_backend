@@ -1,4 +1,4 @@
-const adminServicesService = require('../services/adminServices.service');
+const adminServicesService = require('../services/services.service');
 
 /**
  * Admin Services Controller
