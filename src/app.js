@@ -26,7 +26,7 @@ app.get('/health', (req, res) => {
 const userRoutes = require('./routes/user.routes');
 const adminServicesRoutes = require('./routes/services.routes');
 const adminCategoriesRoutes = require('./routes/categories.routes');
-
+const productsPublicRoutes = require('./routes/products-public.routes');
 const adminSubcategoriesRoutes = require('./routes/subcategories.routes');
 const adminPricingRulesRoutes = require('./routes/pricingRules.routes');
 const adminOrdersRoutes = require('./routes/orders.routes');
@@ -37,10 +37,10 @@ const productRoutes = require('./routes/product.routes');
 
 // Use routes
 app.use('/api/users', userRoutes);
+app.use('/api/products', productsPublicRoutes);
 app.use('/api/admin/products', productRoutes);
 app.use('/api/admin/services', adminServicesRoutes);
 app.use('/api/admin/categories', adminCategoriesRoutes);
-
 app.use('/api/admin/subcategories', adminSubcategoriesRoutes);
 app.use('/api/admin/pricing-rules', adminPricingRulesRoutes);
 app.use('/api/admin/attributes', adminAttributesRoutes);

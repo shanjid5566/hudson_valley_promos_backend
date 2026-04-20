@@ -2,6 +2,103 @@ const prisma = require('../utils/prisma');
 
 class ProductService {
   /**
+   * Get products for public listing with advanced filters
+   * @param {number} page - Page number
+   * @param {number} limit - Items per page
+   * @param {Object} filters - { serviceId, categoryId, subcategoryId, minPrice, maxPrice, search }
+   */
+  async getPublicProducts(page = 1, limit = 12, filters = {}) {
+    try {
+      const offset = (page - 1) * limit;
+      const where = {};
+
+      // Filter by service
+      if (filters.serviceId && filters.serviceId !== 'ALL') {
+        where.category = {
+          serviceId: filters.serviceId
+        };
+      }
+
+      // Filter by category
+      if (filters.categoryId && filters.categoryId !== 'ALL') {
+        where.categoryId = filters.categoryId;
+      }
+
+      // Filter by subcategory
+      if (filters.subcategoryId && filters.subcategoryId !== 'ALL') {
+        where.subcategoryId = filters.subcategoryId;
+      }
+
+      // Filter by price range
+      if (filters.minPrice !== undefined || filters.maxPrice !== undefined) {
+        where.basePrice = {};
+        if (filters.minPrice !== undefined) {
+          where.basePrice.gte = parseFloat(filters.minPrice);
+        }
+        if (filters.maxPrice !== undefined) {
+          where.basePrice.lte = parseFloat(filters.maxPrice);
+        }
+      }
+
+      // Search by product name or description
+      if (filters.search && filters.search.trim()) {
+        where.OR = [
+          { name: { contains: filters.search, mode: 'insensitive' } },
+          { description: { contains: filters.search, mode: 'insensitive' } }
+        ];
+      }
+
+      const products = await prisma.product.findMany({
+        where,
+        include: {
+          category: {
+            select: {
+              id: true,
+              name: true,
+              service: { select: { id: true, name: true } }
+            }
+          },
+          subcategory: {
+            select: { id: true, name: true }
+          },
+          pricingTiers: {
+            select: { minQuantity: true, maxQuantity: true, unitPrice: true }
+          }
+        },
+        orderBy: { createdAt: 'desc' },
+        skip: offset,
+        take: limit
+      });
+
+      const total = await prisma.product.count({ where });
+
+      // Format response
+      const formattedProducts = products.map(product => ({
+        id: product.id,
+        name: product.name,
+        slug: product.slug,
+        description: product.description,
+        basePrice: product.basePrice,
+        images: product.images || [],
+        category: product.category,
+        subcategory: product.subcategory,
+        isFeatured: product.isFeatured,
+        pricingTiers: product.pricingTiers
+      }));
+
+      return {
+        data: formattedProducts,
+        total,
+        page,
+        limit,
+        hasMore: offset + limit < total
+      };
+    } catch (error) {
+      throw new Error(`Failed to fetch products: ${error.message}`);
+    }
+  }
+
+  /**
    * Get all products with search and filters
    */
   async getAllProducts(page = 1, limit = 10, search = '', serviceId = null) {

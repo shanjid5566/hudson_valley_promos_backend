@@ -2,8 +2,62 @@ const productService = require('../services/product.service');
 
 class ProductController {
   /**
-   * Get all products with search and filters
-   * @route GET /api/products?page=1&limit=10&search=&serviceId=
+   * Get all products for public listing with advanced filters (PUBLIC)
+   * @route GET /api/products
+   */
+  async getPublicProducts(req, res) {
+    try {
+      const page = parseInt(req.query.page) || 1;
+      const limit = parseInt(req.query.limit) || 12;
+
+      const filters = {
+        serviceId: req.query.serviceId,
+        categoryId: req.query.categoryId,
+        subcategoryId: req.query.subcategoryId,
+        minPrice: req.query.minPrice,
+        maxPrice: req.query.maxPrice,
+        search: req.query.search
+      };
+
+      const result = await productService.getPublicProducts(page, limit, filters);
+
+      res.status(200).json({
+        success: true,
+        ...result
+      });
+    } catch (error) {
+      res.status(400).json({
+        success: false,
+        error: error.message
+      });
+    }
+  }
+
+  /**
+   * Get single product details (PUBLIC)
+   * @route GET /api/products/:id
+   */
+  async getPublicProductById(req, res) {
+    try {
+      const { id } = req.params;
+      const product = await productService.getProductById(id);
+
+      res.status(200).json({
+        success: true,
+        data: product
+      });
+    } catch (error) {
+      const statusCode = error.message.includes('not found') ? 404 : 400;
+      res.status(statusCode).json({
+        success: false,
+        error: error.message
+      });
+    }
+  }
+
+  /**
+   * Get all products with search and filters (ADMIN)
+   * @route GET /api/admin/products
    */
   async getAllProducts(req, res) {
     try {

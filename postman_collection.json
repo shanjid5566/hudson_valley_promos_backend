@@ -115,6 +115,90 @@
               "description": "Get single category by ID with all its subcategories."
             }
           ]
+        },
+        {
+          "name": "Products",
+          "item": [
+            {
+              "name": "Get All Products",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/api/products?page=1&limit=12&serviceId=&categoryId=&subcategoryId=&minPrice=&maxPrice=&search=",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "products"
+                  ],
+                  "query": [
+                    {
+                      "key": "page",
+                      "value": "1",
+                      "disabled": false
+                    },
+                    {
+                      "key": "limit",
+                      "value": "12",
+                      "disabled": false
+                    },
+                    {
+                      "key": "serviceId",
+                      "value": "",
+                      "disabled": true
+                    },
+                    {
+                      "key": "categoryId",
+                      "value": "",
+                      "disabled": true
+                    },
+                    {
+                      "key": "subcategoryId",
+                      "value": "",
+                      "disabled": true
+                    },
+                    {
+                      "key": "minPrice",
+                      "value": "",
+                      "disabled": true
+                    },
+                    {
+                      "key": "maxPrice",
+                      "value": "",
+                      "disabled": true
+                    },
+                    {
+                      "key": "search",
+                      "value": "",
+                      "disabled": true
+                    }
+                  ]
+                }
+              },
+              "description": "Get all products with filters. Supports: serviceId, categoryId, subcategoryId, minPrice, maxPrice, search, page, limit"
+            },
+            {
+              "name": "Get Product by ID",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/api/products/{{productId}}",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "products",
+                    "{{productId}}"
+                  ]
+                }
+              },
+              "description": "Get individual product details including pricing tiers and attributes."
+            }
+          ]
         }
       ]
     },
