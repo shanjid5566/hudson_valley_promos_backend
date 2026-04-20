@@ -1,7 +1,395 @@
+// // This is your Prisma schema file,
+// // learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// // Get a free hosted Postgres database in seconds: `npx create-db`
+
+// generator client {
+//   provider   = "prisma-client-js"
+//   engineType = "binary"
+// }
+
+// datasource db {
+//   provider = "postgresql"
+// }
+
+// // ==========================================
+// // User & Authentication
+// // ==========================================
+
+// enum Role {
+//   CUSTOMER
+//   ADMIN
+// }
+
+// model User {
+//   id              String  @id @default(uuid())
+//   email           String  @unique
+//   password        String
+//   firstName       String?
+//   lastName        String?
+//   phone           String?
+//   role            Role    @default(CUSTOMER)
+//   avatarUrl       String?
+//   isEmailVerified Boolean @default(false)
+
+//   addresses       Address[]
+//   orders          Order[]
+//   reviews         Review[]
+//   cart            Cart?
+//   otpVerification OTPVerification?
+
+//   createdAt DateTime @default(now())
+//   updatedAt DateTime @updatedAt
+
+//   @@index([email])
+// }
+
+// model OTPVerification {
+//   id         String   @id @default(uuid())
+//   userId     String   @unique
+//   user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+//   otp        String
+//   expiresAt  DateTime
+//   attempts   Int      @default(0)
+//   isVerified Boolean  @default(false)
+
+//   createdAt DateTime @default(now())
+//   updatedAt DateTime @updatedAt
+// }
+
+// enum AddressType {
+//   BILLING
+//   SHIPPING
+// }
+
+// model Address {
+//   id        String      @id @default(uuid())
+//   userId    String
+//   user      User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+//   type      AddressType
+//   company   String?
+//   street    String
+//   city      String
+//   state     String
+//   zipCode   String
+//   isDefault Boolean     @default(false)
+
+//   orders Order[]
+
+//   createdAt DateTime @default(now())
+//   updatedAt DateTime @updatedAt
+
+//   @@index([userId])
+// }
+
+// // ==========================================
+// // Catalog (Services, Categories & Products)
+// // ==========================================
+
+// model Service {
+//   id          String  @id @default(uuid())
+//   name        String  @unique
+//   slug        String  @unique
+//   description String? @db.Text
+//   icon        String? // Icon URL or class name
+
+//   categories Category[] // Direct categories under this service
+
+//   createdAt DateTime @default(now())
+//   updatedAt DateTime @updatedAt
+
+//   @@index([slug])
+// }
+
+// model Category {
+//   id        String  @id @default(uuid())
+//   serviceId String
+//   service   Service @relation(fields: [serviceId], references: [id], onDelete: Cascade)
+
+//   name        String
+//   slug        String  @unique
+//   description String?
+
+//   subcategories Subcategory[]
+//   products      Product[]
+//   materials     Material[]
+
+//   createdAt DateTime @default(now())
+//   updatedAt DateTime @updatedAt
+
+//   @@index([serviceId])
+//   @@index([slug])
+// }
+
+// model Subcategory {
+//   id         String   @id @default(uuid())
+//   categoryId String
+//   category   Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+//   name        String
+//   slug        String  @unique
+//   description String?
+
+//   products Product[]
+
+//   createdAt DateTime @default(now())
+//   updatedAt DateTime @updatedAt
+
+//   @@index([categoryId])
+//   @@index([slug])
+// }
+
+// model Product {
+//   id            String       @id @default(uuid())
+//   categoryId    String?
+//   category      Category?    @relation(fields: [categoryId], references: [id])
+//   subcategoryId String?
+//   subcategory   Subcategory? @relation(fields: [subcategoryId], references: [id])
+//   name          String
+//   slug          String       @unique
+//   description   String       @db.Text
+//   basePrice     Decimal      @db.Decimal(10, 2)
+//   images        String[] // Array of image URLs
+//   isFeatured    Boolean      @default(false)
+
+//   // Product variants (colors, sizes, materials, etc.)
+//   // Example: { colors: [{value: "Red", hex: "#FF0000", extraCost: 0}], sizes: [{value: "XL", extraCost: 1}] }
+//   variants Json?
+
+//   pricingTiers PricingTier[]
+//   reviews      Review[]
+//   cartItems    CartItem[]
+//   orderItems   OrderItem[]
+
+//   createdAt DateTime @default(now())
+//   updatedAt DateTime @updatedAt
+
+//   @@index([categoryId])
+// }
+
+// // "Buy more, Save more" logic
+// model PricingTier {
+//   id          String  @id @default(uuid())
+//   productId   String
+//   product     Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+//   minQuantity Int
+//   maxQuantity Int? // Null means unlimited/250+
+//   unitPrice   Decimal @db.Decimal(10, 2)
+
+//   @@index([productId])
+// }
+
+// // ==========================================
+// // Pricing Rules (Global Platform Fees)
+// // ==========================================
+
+// enum PricingRuleType {
+//   FIXED
+//   PERCENTAGE
+// }
+
+// model PricingRule {
+//   id          String          @id @default(uuid())
+//   name        String          @unique
+//   type        PricingRuleType @default(FIXED)
+//   value       Decimal         @db.Decimal(10, 2)
+//   description String?         @db.Text
+
+//   createdAt DateTime @default(now())
+//   updatedAt DateTime @updatedAt
+// }
+
+// // ==========================================
+// // Materials Management
+// // ==========================================
+
+// model Material {
+//   id         String   @id @default(uuid())
+//   name       String   @unique
+//   categoryId String
+//   category   Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  
+//   createdAt  DateTime @default(now())
+//   updatedAt  DateTime @updatedAt
+
+//   @@index([categoryId])
+// }
+
+// // ==========================================
+// // Printing Methods
+// // ==========================================
+
+// model PrintingMethod {
+//   id          String   @id @default(uuid())
+//   name        String   @unique
+//   description String?  @db.Text
+
+//   createdAt   DateTime @default(now())
+//   updatedAt   DateTime @updatedAt
+// }
+
+// // ==========================================
+// // E-commerce Core (Cart & Orders)
+// // ==========================================
+
+// model Cart {
+//   id     String     @id @default(uuid())
+//   userId String     @unique
+//   user   User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+//   items  CartItem[]
+
+//   updatedAt DateTime @updatedAt
+// }
+
+// model CartItem {
+//   id        String  @id @default(uuid())
+//   cartId    String
+//   cart      Cart    @relation(fields: [cartId], references: [id], onDelete: Cascade)
+//   productId String
+//   product   Product @relation(fields: [productId], references: [id])
+//   quantity  Int
+
+//   // Storing complex user choices (e.g., logo URL, selected text, selected color)
+//   customizationDetails Json?
+
+//   createdAt DateTime @default(now())
+//   updatedAt DateTime @updatedAt
+
+//   @@index([cartId])
+// }
+
+// enum OrderStatus {
+//   PENDING
+//   PROCESSING
+//   COMPLETED
+//   CANCELLED
+// }
+
+// model Order {
+//   id                String  @id @default(uuid())
+//   orderNumber       String  @unique // E.g., #45897
+//   userId            String
+//   user              User    @relation(fields: [userId], references: [id])
+//   shippingAddressId String
+//   shippingAddress   Address @relation(fields: [shippingAddressId], references: [id])
+
+//   subTotal     Decimal     @db.Decimal(10, 2)
+//   shippingCost Decimal     @db.Decimal(10, 2)
+//   totalAmount  Decimal     @db.Decimal(10, 2)
+//   status       OrderStatus @default(PENDING)
+
+//   // Stripe Specific Fields
+//   stripeSessionId       String? @unique // Checkout Session ID
+//   stripePaymentIntentId String? @unique // Payment Intent ID for Webhooks
+
+//   items    OrderItem[]
+//   payments Payment[]
+
+//   createdAt DateTime @default(now())
+//   updatedAt DateTime @updatedAt
+
+//   @@index([userId])
+//   @@index([stripePaymentIntentId])
+// }
+
+// model OrderItem {
+//   id        String  @id @default(uuid())
+//   orderId   String
+//   order     Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+//   productId String
+//   product   Product @relation(fields: [productId], references: [id])
+
+//   quantity  Int
+//   unitPrice Decimal @db.Decimal(10, 2)
+
+//   // Immutable snapshot of customization at the time of order
+//   customizationDetails Json?
+
+//   createdAt DateTime @default(now())
+
+//   @@index([orderId])
+// }
+
+// // ==========================================
+// // Payment & Stripe Integration
+// // ==========================================
+
+// enum PaymentStatus {
+//   PENDING
+//   AUTHORIZED
+//   SUCCESS
+//   FAILED
+//   REFUNDED
+// }
+
+// enum PaymentMethodType {
+//   STRIPE_CARD
+//   STRIPE_APPLE_PAY
+//   STRIPE_GOOGLE_PAY
+// }
+
+// model Payment {
+//   id      String @id @default(uuid())
+//   orderId String
+//   order   Order  @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+//   amount   Decimal           @db.Decimal(10, 2)
+//   currency String            @default("USD")
+//   status   PaymentStatus     @default(PENDING)
+//   method   PaymentMethodType
+
+//   // Stripe Data
+//   stripeChargeId    String? @unique
+//   rawStripeResponse Json? // Storing raw webhook data for debugging/logging
+
+//   createdAt DateTime @default(now())
+//   updatedAt DateTime @updatedAt
+
+//   @@index([orderId])
+// }
+
+// model Refund {
+//   id             String  @id @default(uuid())
+//   paymentId      String
+//   stripeRefundId String  @unique
+//   amount         Decimal @db.Decimal(10, 2)
+//   reason         String?
+//   status         String // e.g., succeeded, pending, failed
+
+//   createdAt DateTime @default(now())
+// }
+
+// // ==========================================
+// // Customer Reviews
+// // ==========================================
+
+// model Review {
+//   id        String  @id @default(uuid())
+//   productId String
+//   product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+//   userId    String
+//   user      User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+//   rating     Int // 1-5 scale
+//   comment    String  @db.Text
+//   isApproved Boolean @default(true)
+
+//   createdAt DateTime @default(now())
+//   updatedAt DateTime @updatedAt
+
+//   @@index([productId])
+//   @@index([userId])
+// }
+
+
+
+
+// ==========================================================================================================================z
+
+
+
 // This is your Prisma schema file,
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Get a free hosted Postgres database in seconds: `npx create-db`
 
 generator client {
   provider   = "prisma-client-js"
@@ -112,7 +500,9 @@ model Category {
 
   subcategories Subcategory[]
   products      Product[]
-  materials     Material[]
+  
+  // NEW: Relation to dynamic product attributes
+  attributes    ProductAttribute[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -149,12 +539,12 @@ model Product {
   slug          String       @unique
   description   String       @db.Text
   basePrice     Decimal      @db.Decimal(10, 2)
-  images        String[] // Array of image URLs
+  images        String[]     // Array of image URLs
   isFeatured    Boolean      @default(false)
 
-  // Product variants (colors, sizes, materials, etc.)
-  // Example: { colors: [{value: "Red", hex: "#FF0000", extraCost: 0}], sizes: [{value: "XL", extraCost: 1}] }
-  variants Json?
+  // UPDATED: Replaced variants with attributes to match dynamic structure
+  // Stores selected values for the attributes (e.g., {"Color": "Red", "Size": "XL"})
+  attributes Json?
 
   pricingTiers PricingTier[]
   reviews      Review[]
@@ -173,7 +563,7 @@ model PricingTier {
   productId   String
   product     Product @relation(fields: [productId], references: [id], onDelete: Cascade)
   minQuantity Int
-  maxQuantity Int? // Null means unlimited/250+
+  maxQuantity Int?    // Null means unlimited
   unitPrice   Decimal @db.Decimal(10, 2)
 
   @@index([productId])
@@ -200,32 +590,46 @@ model PricingRule {
 }
 
 // ==========================================
-// Materials Management
+// Dynamic Product Attributes (NEW ADDITION)
 // ==========================================
 
-model Material {
-  id         String   @id @default(uuid())
-  name       String   @unique
-  categoryId String
-  category   Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+enum AttributeInputType {
+  CHECKBOX
+  RADIO
+  PILLS
+  RICH_PILLS
+  COLOR_SWATCHES
+  DROPDOWN
+}
+
+model ProductAttribute {
+  id          String             @id @default(uuid())
+  name        String
+  type        AttributeInputType
+  categoryId  String
+  category    Category           @relation(fields: [categoryId], references: [id], onDelete: Cascade)
   
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+  options     AttributeOption[]
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
   @@index([categoryId])
 }
 
-// ==========================================
-// Printing Methods
-// ==========================================
-
-model PrintingMethod {
-  id          String   @id @default(uuid())
-  name        String   @unique
-  description String?  @db.Text
+model AttributeOption {
+  id          String           @id @default(uuid())
+  attributeId String
+  attribute   ProductAttribute @relation(fields: [attributeId], references: [id], onDelete: Cascade)
+  
+  value       String           // Main text (e.g., "Matte Black", "12 oz")
+  subtext     String?          // For rich pills (e.g., "Wine & Coffee Tumbler")
+  colorHex    String?          // For color swatches (e.g., "#000000")
 
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+
+  @@index([attributeId])
 }
 
 // ==========================================
@@ -233,10 +637,10 @@ model PrintingMethod {
 // ==========================================
 
 model Cart {
-  id     String     @id @default(uuid())
-  userId String     @unique
-  user   User       @relation(fields: [userId], references: [id], onDelete: Cascade)
-  items  CartItem[]
+  id        String     @id @default(uuid())
+  userId    String     @unique
+  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  items     CartItem[]
 
   updatedAt DateTime @updatedAt
 }
@@ -249,7 +653,6 @@ model CartItem {
   product   Product @relation(fields: [productId], references: [id])
   quantity  Int
 
-  // Storing complex user choices (e.g., logo URL, selected text, selected color)
   customizationDetails Json?
 
   createdAt DateTime @default(now())
@@ -266,17 +669,17 @@ enum OrderStatus {
 }
 
 model Order {
-  id                String  @id @default(uuid())
-  orderNumber       String  @unique // E.g., #45897
+  id                String      @id @default(uuid())
+  orderNumber       String      @unique // E.g., #45897
   userId            String
-  user              User    @relation(fields: [userId], references: [id])
+  user              User        @relation(fields: [userId], references: [id])
   shippingAddressId String
-  shippingAddress   Address @relation(fields: [shippingAddressId], references: [id])
+  shippingAddress   Address     @relation(fields: [shippingAddressId], references: [id])
 
-  subTotal     Decimal     @db.Decimal(10, 2)
-  shippingCost Decimal     @db.Decimal(10, 2)
-  totalAmount  Decimal     @db.Decimal(10, 2)
-  status       OrderStatus @default(PENDING)
+  subTotal    Decimal     @db.Decimal(10, 2)
+  shippingCost Decimal    @db.Decimal(10, 2)
+  totalAmount Decimal     @db.Decimal(10, 2)
+  status      OrderStatus @default(PENDING)
 
   // Stripe Specific Fields
   stripeSessionId       String? @unique // Checkout Session ID
@@ -302,7 +705,6 @@ model OrderItem {
   quantity  Int
   unitPrice Decimal @db.Decimal(10, 2)
 
-  // Immutable snapshot of customization at the time of order
   customizationDetails Json?
 
   createdAt DateTime @default(now())
@@ -329,9 +731,9 @@ enum PaymentMethodType {
 }
 
 model Payment {
-  id      String @id @default(uuid())
-  orderId String
-  order   Order  @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  id       String            @id @default(uuid())
+  orderId  String
+  order    Order             @relation(fields: [orderId], references: [id], onDelete: Cascade)
 
   amount   Decimal           @db.Decimal(10, 2)
   currency String            @default("USD")
@@ -339,8 +741,8 @@ model Payment {
   method   PaymentMethodType
 
   // Stripe Data
-  stripeChargeId    String? @unique
-  rawStripeResponse Json? // Storing raw webhook data for debugging/logging
+  stripeChargeId   String? @unique
+  rawStripeResponse Json? // Storing raw webhook data
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -354,7 +756,7 @@ model Refund {
   stripeRefundId String  @unique
   amount         Decimal @db.Decimal(10, 2)
   reason         String?
-  status         String // e.g., succeeded, pending, failed
+  status         String  // e.g., succeeded, pending, failed
 
   createdAt DateTime @default(now())
 }
@@ -370,7 +772,7 @@ model Review {
   userId    String
   user      User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  rating     Int // 1-5 scale
+  rating     Int     // 1-5 scale
   comment    String  @db.Text
   isApproved Boolean @default(true)
 

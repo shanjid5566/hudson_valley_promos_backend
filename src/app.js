@@ -1,4 +1,5 @@
 const express = require('express');
+const path = require('path');
 
 // Initialize Express app
 const app = express();
@@ -8,6 +9,9 @@ app.use(express.json());
 
 // Middleware to parse URL-encoded request bodies
 app.use(express.urlencoded({ extended: true }));
+
+// Serve uploaded files
+app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 
 // Health check route
 app.get('/health', (req, res) => {
@@ -24,19 +28,19 @@ const adminServicesRoutes = require('./routes/adminServices.routes');
 const adminCategoriesRoutes = require('./routes/adminCategories.routes');
 const adminSubcategoriesRoutes = require('./routes/adminSubcategories.routes');
 const adminPricingRulesRoutes = require('./routes/adminPricingRules.routes');
-const adminMaterialsRoutes = require('./routes/adminMaterials.routes');
-const adminPrintingMethodsRoutes = require('./routes/adminPrintingMethods.routes');
 const adminOrdersRoutes = require('./routes/adminOrders.routes');
 const adminSubcategoriesController = require('./controllers/adminSubcategories.controller');
+const adminAttributesRoutes = require('./routes/adminAttributes.routes');
+const productRoutes = require('./routes/product.routes');
 
 // Use routes
 app.use('/api/users', userRoutes);
+app.use('/api/admin/products', productRoutes);
 app.use('/api/admin/services', adminServicesRoutes);
 app.use('/api/admin/categories', adminCategoriesRoutes);
 app.use('/api/admin/subcategories', adminSubcategoriesRoutes);
 app.use('/api/admin/pricing-rules', adminPricingRulesRoutes);
-app.use('/api/admin/materials', adminMaterialsRoutes);
-app.use('/api/admin/printing-methods', adminPrintingMethodsRoutes);
+app.use('/api/admin/attributes', adminAttributesRoutes);
 app.use('/api/admin/orders', adminOrdersRoutes);
 
 // Nested route: Get subcategories of a specific category
