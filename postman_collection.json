@@ -64,6 +64,55 @@
               }
             }
           ]
+        },
+        {
+          "name": "Categories",
+          "item": [
+            {
+              "name": "Get All Categories",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/api/categories",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "categories"
+                  ],
+                  "query": [
+                    {
+                      "key": "serviceId",
+                      "value": "{{serviceId}}",
+                      "disabled": false
+                    }
+                  ]
+                }
+              },
+              "description": "Get all categories with subcategories. Pass serviceId to filter by specific service."
+            },
+            {
+              "name": "Get Category by ID",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/api/categories/{{categoryId}}",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "categories",
+                    "{{categoryId}}"
+                  ]
+                }
+              },
+              "description": "Get single category by ID with all its subcategories."
+            }
+          ]
         }
       ]
     },
