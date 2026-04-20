@@ -30,6 +30,44 @@
       ]
     },
     {
+      "name": "Public",
+      "item": [
+        {
+          "name": "Services",
+          "item": [
+            {
+              "name": "Get All Services",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/api/admin/services?page=1&limit=10",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "admin",
+                    "services"
+                  ],
+                  "query": [
+                    {
+                      "key": "page",
+                      "value": "1"
+                    },
+                    {
+                      "key": "limit",
+                      "value": "10"
+                    }
+                  ]
+                }
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
       "name": "Users",
       "item": [
         {
