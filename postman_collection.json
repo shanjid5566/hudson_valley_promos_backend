@@ -1292,6 +1292,36 @@
           ]
         },
         {
+          "name": "Dashboard",
+          "item": [
+            {
+              "name": "Get Dashboard Overview",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{adminToken}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/admin/dashboard/overview",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "admin",
+                    "dashboard",
+                    "overview"
+                  ]
+                }
+              },
+              "description": "Get comprehensive dashboard overview including revenue, order statistics, growth percentages, monthly sales data, and top selling categories."
+            }
+          ]
+        },
+        {
           "name": "Orders",
           "item": [
             {

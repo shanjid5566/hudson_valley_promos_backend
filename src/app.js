@@ -29,6 +29,7 @@ const adminCategoriesRoutes = require('./routes/adminCategories.routes');
 const adminSubcategoriesRoutes = require('./routes/adminSubcategories.routes');
 const adminPricingRulesRoutes = require('./routes/adminPricingRules.routes');
 const adminOrdersRoutes = require('./routes/adminOrders.routes');
+const adminDashboardRoutes = require('./routes/adminDashboard.routes');
 const adminSubcategoriesController = require('./controllers/adminSubcategories.controller');
 const adminAttributesRoutes = require('./routes/adminAttributes.routes');
 const productRoutes = require('./routes/product.routes');
@@ -42,6 +43,7 @@ app.use('/api/admin/subcategories', adminSubcategoriesRoutes);
 app.use('/api/admin/pricing-rules', adminPricingRulesRoutes);
 app.use('/api/admin/attributes', adminAttributesRoutes);
 app.use('/api/admin/orders', adminOrdersRoutes);
+app.use('/api/admin/dashboard', adminDashboardRoutes);
 
 // Nested route: Get subcategories of a specific category
 app.get('/api/admin/categories/:id/subcategories', adminSubcategoriesController.getSubcategoriesByCategory.bind(adminSubcategoriesController));
