@@ -629,6 +629,55 @@ class UserService {
       throw new Error(`Password reset failed: ${error.message}`);
     }
   }
+
+  /**
+   * Change password for authenticated user or admin
+   * @param {string} id - User ID
+   * @param {string} currentPassword - Current password for verification
+   * @param {string} newPassword - New password to set
+   * @returns {Promise<Object>} Change password result
+   */
+  async changePassword(id, currentPassword, newPassword) {
+    try {
+      // Find user by ID
+      const user = await prisma.user.findUnique({
+        where: { id },
+        select: {
+          id: true,
+          email: true,
+          password: true,
+          firstName: true
+        }
+      });
+
+      if (!user) {
+        throw new Error('User not found');
+      }
+
+      // Verify current password
+      const isPasswordValid = await bcrypt.compare(currentPassword, user.password);
+      if (!isPasswordValid) {
+        throw new Error('Current password is incorrect');
+      }
+
+      // Hash new password
+      const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+      // Update password
+      await prisma.user.update({
+        where: { id },
+        data: { password: hashedPassword }
+      });
+
+      return {
+        success: true,
+        message: 'Password changed successfully',
+        email: user.email
+      };
+    } catch (error) {
+      throw new Error(`Failed to change password: ${error.message}`);
+    }
+  }
 }
 
 module.exports = new UserService();

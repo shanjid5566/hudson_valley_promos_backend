@@ -440,6 +440,67 @@ class UserController {
       });
     }
   }
+
+  /**
+   * Change password for authenticated user or admin
+   * @route PUT /api/users/change-password
+   * @body {Object} - { currentPassword, newPassword, confirmPassword }
+   * Authorization: Users can change their own password, admins can change any user's password (pass userId in body)
+   */
+  async changePassword(req, res, next) {
+    try {
+      const { currentPassword, newPassword, confirmPassword, userId } = req.body;
+
+      // Validation
+      if (!currentPassword || !newPassword || !confirmPassword) {
+        return res.status(400).json({
+          success: false,
+          error: 'Current password, new password, and confirm password are required'
+        });
+      }
+
+      if (newPassword !== confirmPassword) {
+        return res.status(400).json({
+          success: false,
+          error: 'Passwords do not match'
+        });
+      }
+
+      if (newPassword.length < 8) {
+        return res.status(400).json({
+          success: false,
+          error: 'Password must be at least 8 characters long'
+        });
+      }
+
+      // Determine which user ID to use
+      const targetUserId = req.user.role === 'ADMIN' ? (userId || req.user.id) : req.user.id;
+
+      // Check authorization: regular users can only change their own password
+      if (req.user.role !== 'ADMIN' && userId) {
+        return res.status(403).json({
+          success: false,
+          error: 'You do not have permission to change another user password'
+        });
+      }
+
+      const result = await userService.changePassword(targetUserId, currentPassword, newPassword);
+
+      res.status(200).json({
+        success: true,
+        message: result.message,
+        data: {
+          email: result.email
+        }
+      });
+    } catch (error) {
+      const statusCode = error.message.includes('incorrect') ? 401 : 400;
+      res.status(statusCode).json({
+        success: false,
+        error: error.message
+      });
+    }
+  }
 }
 
 module.exports = new UserController();

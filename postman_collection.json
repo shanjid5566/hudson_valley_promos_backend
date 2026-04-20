@@ -268,6 +268,38 @@
             }
           },
           "description": "Get user profile by ID. Users can retrieve their own profile using their user token. Admins can retrieve any user profile using admin token."
+        },
+        {
+          "name": "Change Password",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"currentPassword\": \"OldPassword123\",\n  \"newPassword\": \"NewPassword123\",\n  \"confirmPassword\": \"NewPassword123\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/users/change-password",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "users",
+                "change-password"
+              ]
+            }
+          },
+          "description": "Change password for authenticated user. User ID is extracted from the token. Requires current password verification and minimum 8 characters for new password."
         }
       ]
     },
@@ -406,6 +438,38 @@
                   ]
                 }
               }
+            },
+            {
+              "name": "Change Password",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{adminToken}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"currentPassword\": \"OldPassword123\",\n  \"newPassword\": \"NewPassword123\",\n  \"confirmPassword\": \"NewPassword123\",\n  \"userId\": \"(optional - only for admins to change other user's password)\"\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/users/change-password",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "users",
+                    "change-password"
+                  ]
+                }
+              },
+              "description": "Change password for any user (Admin version). Admins can change their own or any other user's password by passing userId in request body. Requires current password verification and minimum 8 characters for new password."
             }
           ]
         },

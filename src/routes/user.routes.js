@@ -63,6 +63,9 @@ router.post('/', verifyAdminToken, userController.createUser.bind(userController
 // PUT update existing user
 router.put('/:id', verifyAdminToken, userController.updateUser.bind(userController));
 
+// PUT change password for authenticated user or admin
+router.put('/change-password', verifyUserOrAdminToken, userController.changePassword.bind(userController));
+
 // DELETE user
 router.delete('/:id', verifyAdminToken, userController.deleteUser.bind(userController));
 
