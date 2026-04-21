@@ -19,7 +19,10 @@ const ALLOWED_ATTRIBUTE_TYPES = [
   'PILLS',
   'RICH_PILLS',
   'COLOR_SWATCHES',
-  'DROPDOWN'
+  'DROPDOWN',
+  'FILE_UPLOAD',
+  'TEXT_INPUT',
+  'TEXT_AREA'
 ];
 
 class AdminAttributesService {
@@ -28,11 +31,9 @@ class AdminAttributesService {
       const offset = (page - 1) * limit;
       const where = {};
 
-      // Build where clause based on filters
       if (filters.categoryId) {
         where.categoryId = filters.categoryId;
       } else if (filters.serviceId) {
-        // If serviceId is provided, get all categories for that service
         const categories = await prisma.category.findMany({
           where: { serviceId: filters.serviceId },
           select: { id: true }
@@ -41,7 +42,6 @@ class AdminAttributesService {
         if (categoryIds.length > 0) {
           where.categoryId = { in: categoryIds };
         } else {
-          // No categories for this service, return empty result
           return {
             data: [],
             total: 0,
@@ -60,7 +60,10 @@ class AdminAttributesService {
           },
           options: true
         },
-        orderBy: { createdAt: 'desc' },
+        orderBy: [
+          { stepOrder: 'asc' },
+          { createdAt: 'desc' }
+        ],
         skip: offset,
         take: limit
       });
@@ -83,7 +86,8 @@ class AdminAttributesService {
     try {
       const attributes = await prisma.productAttribute.findMany({
         where: { categoryId },
-        include: { options: true }
+        include: { options: true },
+        orderBy: { stepOrder: 'asc' }
       });
       return attributes;
     } catch (error) {
@@ -92,13 +96,26 @@ class AdminAttributesService {
   }
 
   async createAttribute(data) {
-    const { name, type, categoryId, options } = data;
+    const { name, type, categoryId, options = [], stepOrder = 0, isRequired = false } = data;
     const normalizedType = normalizeAttributeType(type);
     
     try {
-      // Validate Category
       const category = await prisma.category.findUnique({ where: { id: categoryId } });
       if (!category) throw new Error('Category not found');
+
+      const existingAttribute = await prisma.productAttribute.findFirst({
+        where: {
+          categoryId: categoryId,
+          name: {
+            equals: name.trim(),
+            mode: 'insensitive'
+          }
+        }
+      });
+
+      if (existingAttribute) {
+        throw new Error(`An attribute with the name "${name}" already exists for this category.`);
+      }
 
       if (!normalizedType || !ALLOWED_ATTRIBUTE_TYPES.includes(normalizedType)) {
         throw new Error(
@@ -106,19 +123,22 @@ class AdminAttributesService {
         );
       }
 
-      // Create Attribute with nested Options
+      const attributeOptions = options.length > 0 ? {
+        create: options.map(opt => ({
+          value: opt.value,
+          subtext: opt.subtext || null,
+          colorHex: opt.colorHex || null
+        }))
+      } : undefined;
+
       const attribute = await prisma.productAttribute.create({
         data: {
-          name,
+          name: name.trim(),
           type: normalizedType,
           categoryId,
-          options: {
-            create: options.map(opt => ({
-              value: opt.value,
-              subtext: opt.subtext || null,
-              colorHex: opt.colorHex || null
-            }))
-          }
+          stepOrder: parseInt(stepOrder, 10) || 0,
+          isRequired: Boolean(isRequired),
+          options: attributeOptions
         },
         include: { options: true }
       });

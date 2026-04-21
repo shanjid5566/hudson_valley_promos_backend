@@ -1,35 +1,25 @@
 const prisma = require('../utils/prisma');
 
 class ProductService {
-  /**
-   * Get products for public listing with advanced filters
-   * @param {number} page - Page number
-   * @param {number} limit - Items per page
-   * @param {Object} filters - { serviceId, categoryId, subcategoryId, minPrice, maxPrice, search }
-   */
   async getPublicProducts(page = 1, limit = 12, filters = {}) {
     try {
       const offset = (page - 1) * limit;
       const where = {};
 
-      // Filter by service
       if (filters.serviceId && filters.serviceId !== 'ALL') {
         where.category = {
           serviceId: filters.serviceId
         };
       }
 
-      // Filter by category
       if (filters.categoryId && filters.categoryId !== 'ALL') {
         where.categoryId = filters.categoryId;
       }
 
-      // Filter by subcategory
       if (filters.subcategoryId && filters.subcategoryId !== 'ALL') {
         where.subcategoryId = filters.subcategoryId;
       }
 
-      // Filter by price range
       if (filters.minPrice !== undefined || filters.maxPrice !== undefined) {
         where.basePrice = {};
         if (filters.minPrice !== undefined) {
@@ -40,7 +30,6 @@ class ProductService {
         }
       }
 
-      // Search by product name or description
       if (filters.search && filters.search.trim()) {
         where.OR = [
           { name: { contains: filters.search, mode: 'insensitive' } },
@@ -72,7 +61,6 @@ class ProductService {
 
       const total = await prisma.product.count({ where });
 
-      // Format response
       const formattedProducts = products.map(product => ({
         id: product.id,
         name: product.name,
@@ -98,15 +86,11 @@ class ProductService {
     }
   }
 
-  /**
-   * Get all products with search and filters
-   */
   async getAllProducts(page = 1, limit = 10, search = '', serviceId = null) {
     try {
       const offset = (page - 1) * limit;
       const where = {};
 
-      // Search by product name or description
       if (search && search.trim()) {
         where.OR = [
           { name: { contains: search, mode: 'insensitive' } },
@@ -114,7 +98,6 @@ class ProductService {
         ];
       }
 
-      // Filter by service (through category)
       if (serviceId && serviceId !== 'ALL') {
         where.category = {
           serviceId
@@ -145,23 +128,27 @@ class ProductService {
 
       const total = await prisma.product.count({ where });
 
-      // Format variants for display (e.g., show sizes as "S, M, L")
-      const formattedProducts = products.map(product => ({
-        ...product,
-        variantsSummary: product.variants
-          ? Object.entries(product.variants)
-              .map(([key, options]) => {
-                if (Array.isArray(options) && options.length > 0) {
-                  return options
-                    .slice(0, 3)
-                    .map(opt => opt.value)
-                    .join(', ') + (options.length > 3 ? `, +${options.length - 3}` : '');
-                }
-                return null;
-              })
-              .filter(Boolean)
-          : []
-      }));
+      const formattedProducts = products.map(product => {
+        let attributesSummary = [];
+        
+        if (product.attributes && typeof product.attributes === 'object') {
+          attributesSummary = Object.entries(product.attributes)
+            .map(([key, options]) => {
+              if (Array.isArray(options) && options.length > 0) {
+                const limitOptions = options.slice(0, 3);
+                const extraCount = options.length - 3;
+                return limitOptions.join(', ') + (extraCount > 0 ? `, +${extraCount}` : '');
+              }
+              return null;
+            })
+            .filter(Boolean);
+        }
+
+        return {
+          ...product,
+          attributesSummary
+        };
+      });
 
       return {
         data: formattedProducts,
@@ -175,9 +162,6 @@ class ProductService {
     }
   }
 
-  /**
-   * Get a single product by ID with full details
-   */
   async getProductById(id) {
     try {
       const product = await prisma.product.findUnique({
@@ -209,9 +193,6 @@ class ProductService {
     }
   }
 
-  /**
-   * Create a new product
-   */
   async createProduct(data) {
     const {
       name,
@@ -226,18 +207,15 @@ class ProductService {
     } = data;
 
     try {
-      // Validate required fields
       if (!name || !categoryId || !basePrice) {
         throw new Error('Name, categoryId, and basePrice are required');
       }
 
-      // Validate category exists
       const category = await prisma.category.findUnique({ where: { id: categoryId } });
       if (!category) {
         throw new Error('Category not found');
       }
 
-      // Validate subcategory if provided
       if (subcategoryId) {
         const subcategory = await prisma.subcategory.findUnique({
           where: { id: subcategoryId }
@@ -247,7 +225,6 @@ class ProductService {
         }
       }
 
-      // Generate unique slug from name
       const baseSlug = name
         .trim()
         .toLowerCase()
@@ -255,11 +232,9 @@ class ProductService {
         .replace(/\s+/g, '-')
         .replace(/-+/g, '-');
       
-      // Append unique identifier to ensure slug uniqueness
       const uniqueSuffix = Date.now().toString(36) + Math.random().toString(36).substr(2, 9);
       const slug = `${baseSlug}-${uniqueSuffix}`;
 
-      // Create product with nested pricing tiers
       const product = await prisma.product.create({
         data: {
           name: name.trim(),
@@ -306,9 +281,6 @@ class ProductService {
     }
   }
 
-  /**
-   * Update an existing product
-   */
   async updateProduct(id, data) {
     const {
       name,
@@ -328,7 +300,6 @@ class ProductService {
         throw new Error('Product not found');
       }
 
-      // Validate category if provided
       if (categoryId) {
         const category = await prisma.category.findUnique({ where: { id: categoryId } });
         if (!category) {
@@ -336,8 +307,7 @@ class ProductService {
         }
       }
 
-      // Validate subcategory if provided
-      if (subcategoryId) {
+      if (subcategoryId !== undefined && subcategoryId !== null) {
         const subcategory = await prisma.subcategory.findUnique({
           where: { id: subcategoryId }
         });
@@ -350,7 +320,6 @@ class ProductService {
 
       if (name) {
         updateData.name = name.trim();
-        // Generate unique slug when name is updated
         const baseSlug = name
           .trim()
           .toLowerCase()
@@ -368,6 +337,7 @@ class ProductService {
           connect: { id: categoryId }
         };
       }
+      
       if (subcategoryId !== undefined) {
         updateData.subcategory = subcategoryId ? {
           connect: { id: subcategoryId }
@@ -375,11 +345,11 @@ class ProductService {
           disconnect: true
         };
       }
+      
       if (attributes !== undefined) updateData.attributes = attributes;
       if (images !== undefined) updateData.images = images;
       if (isFeatured !== undefined) updateData.isFeatured = isFeatured;
 
-      // Delete old pricing tiers and create new ones if provided
       if (pricingTiers) {
         await prisma.pricingTier.deleteMany({ where: { productId: id } });
         updateData.pricingTiers = {
@@ -415,9 +385,6 @@ class ProductService {
     }
   }
 
-  /**
-   * Delete a product
-   */
   async deleteProduct(id) {
     try {
       const product = await prisma.product.findUnique({ where: { id } });
@@ -425,7 +392,6 @@ class ProductService {
         throw new Error('Product not found');
       }
 
-      // Check if product has any order items
       const orderItemsCount = await prisma.orderItem.count({
         where: { productId: id }
       });

@@ -7,7 +7,6 @@ class AdminAttributesController {
       const limit = parseInt(req.query.limit) || 20;
       const filters = {};
 
-      // Extract optional filters
       if (req.query.serviceId && req.query.serviceId !== 'ALL') {
         filters.serviceId = req.query.serviceId;
       }
@@ -36,8 +35,15 @@ class AdminAttributesController {
     try {
       const { name, type, categoryId, options } = req.body;
 
-      if (!name || !type || !categoryId || !Array.isArray(options) || options.length === 0) {
-        return res.status(400).json({ success: false, error: 'Name, type, categoryId, and at least one option are required.' });
+      if (!name || !type || !categoryId) {
+        return res.status(400).json({ success: false, error: 'Name, type, and categoryId are required.' });
+      }
+
+      const typesRequiringOptions = ['RADIO', 'CHECKBOX', 'DROPDOWN', 'PILLS', 'RICH_PILLS', 'COLOR_SWATCHES'];
+      const normalizedType = type.trim().toUpperCase().replace(/[\s-]+/g, '_');
+      
+      if (typesRequiringOptions.includes(normalizedType) && (!Array.isArray(options) || options.length === 0)) {
+        return res.status(400).json({ success: false, error: 'At least one option is required for this input type.' });
       }
 
       const attribute = await adminAttributesService.createAttribute(req.body);
