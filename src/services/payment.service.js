@@ -1,5 +1,18 @@
 const prisma = require('../utils/prisma');
-const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
+
+// Initialize Stripe lazily to avoid requiring API key at startup
+let stripe = null;
+
+const getStripe = () => {
+  if (!stripe) {
+    if (!process.env.STRIPE_SECRET_KEY) {
+      throw new Error('STRIPE_SECRET_KEY is not configured in .env file');
+    }
+    const Stripe = require('stripe');
+    stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+  }
+  return stripe;
+};
 
 class PaymentService {
   async createCheckoutSession(userId, orderId) {
@@ -32,7 +45,7 @@ class PaymentService {
         });
       }
 
-      const session = await stripe.checkout.sessions.create({
+      const session = await getStripe().checkout.sessions.create({
         payment_method_types: ['card'],
         customer_email: order.user.email,
         line_items: lineItems,
@@ -55,7 +68,7 @@ class PaymentService {
 
   async verifySessionAndFulfillOrder(userId, sessionId) {
     try {
-      const session = await stripe.checkout.sessions.retrieve(sessionId);
+      const session = await getStripe().checkout.sessions.retrieve(sessionId);
 
       if (session.payment_status !== 'paid') {
         throw new Error('Payment has not been completed yet.');

@@ -367,6 +367,159 @@
               "description": "Clear entire user cart - remove all items"
             }
           ]
+        },
+        {
+          "name": "Checkout",
+          "item": [
+            {
+              "name": "Get Checkout Data",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{userToken}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/user/checkout",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "user",
+                    "checkout"
+                  ]
+                }
+              },
+              "description": "Fetch checkout data including cart items and saved addresses for the user"
+            }
+          ]
+        },
+        {
+          "name": "Order",
+          "item": [
+            {
+              "name": "Create Order",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "if (pm.response.code === 201) {",
+                      "  const response = pm.response.json();",
+                      "  if (response.data && response.data.id) {",
+                      "    pm.environment.set('orderId', response.data.id);",
+                      "  }",
+                      "}"
+                    ],
+                    "type": "javascript"
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{userToken}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"newAddress\": {\n    \"street\": \"123 Main Street\",\n    \"city\": \"New York\",\n    \"state\": \"NY\",\n    \"zipCode\": \"10001\",\n    \"company\": \"Acme Corp\",\n    \"saveAsDefault\": true\n  },\n  \"paymentMethod\": \"STRIPE_CARD\"\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/user/order",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "user",
+                    "order"
+                  ]
+                }
+              },
+              "description": "Create a new order from cart items. Provide either an existing shippingAddressId or a newAddress object. newAddress supports: street (required), city (required), state (required), zipCode (required), company (optional), saveAsDefault (optional). Automatically sets orderId variable on success."
+            }
+          ]
+        },
+        {
+          "name": "Payment",
+          "item": [
+            {
+              "name": "Create Checkout Session",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{userToken}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"orderId\": \"{{orderId}}\"\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/user/payment/create-checkout-session",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "user",
+                    "payment",
+                    "create-checkout-session"
+                  ]
+                }
+              },
+              "description": "Create a Stripe checkout session for payment. Returns checkout URL and session ID."
+            },
+            {
+              "name": "Verify Payment Session",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{userToken}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"sessionId\": \"stripe-session-id-here\"\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/user/payment/verify-session",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "user",
+                    "payment",
+                    "verify-session"
+                  ]
+                }
+              },
+              "description": "Verify Stripe payment session and fulfill order if payment successful"
+            }
+          ]
         }
       ]
     },

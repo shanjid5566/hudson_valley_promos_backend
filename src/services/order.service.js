@@ -3,7 +3,7 @@ const crypto = require('crypto');
 
 class OrderService {
   async createOrder(userId, orderData) {
-    const { shippingAddressId, paymentMethod = 'STRIPE_CARD' } = orderData;
+    const { shippingAddressId, newAddress, paymentMethod = 'STRIPE_CARD' } = orderData;
 
     try {
       const cart = await prisma.cart.findUnique({
@@ -15,31 +15,55 @@ class OrderService {
         throw new Error('Cannot place order. Cart is empty.');
       }
 
-      const address = await prisma.address.findFirst({
-        where: { id: shippingAddressId, userId }
-      });
+      let finalAddressId = shippingAddressId;
 
-      if (!address) throw new Error('Invalid shipping address selected.');
+      return await prisma.$transaction(async (tx) => {
+        
+        // Handle New Address Logic
+        if (newAddress && !shippingAddressId) {
+          const createdAddress = await tx.address.create({
+            data: {
+              userId,
+              type: 'SHIPPING',
+              company: newAddress.company || null,
+              street: newAddress.street.trim(),
+              city: newAddress.city.trim(),
+              state: newAddress.state.trim(),
+              zipCode: newAddress.zipCode.trim(),
+              isDefault: Boolean(newAddress.saveAsDefault) 
+            }
+          });
+          finalAddressId = createdAddress.id;
+        } else {
+          // Verify Existing Address
+          const addressExists = await tx.address.findFirst({
+            where: { id: finalAddressId, userId }
+          });
+          if (!addressExists) {
+            throw new Error('Invalid shipping address selected.');
+          }
+        }
 
-      let subTotal = 0;
-      cart.items.forEach(item => {
-        subTotal += parseFloat(item.product.basePrice) * item.quantity;
-      });
+        // Calculate Totals
+        let subTotal = 0;
+        cart.items.forEach(item => {
+          subTotal += parseFloat(item.product.basePrice) * item.quantity;
+        });
 
-      const shippingRule = await prisma.pricingRule.findFirst({
-        where: { name: 'Shipping cost', type: 'FIXED' }
-      });
-      const shippingCost = shippingRule ? parseFloat(shippingRule.value) : 20.00; 
+        const shippingRule = await tx.pricingRule.findFirst({
+          where: { name: 'Shipping cost', type: 'FIXED' }
+        });
+        const shippingCost = shippingRule ? parseFloat(shippingRule.value) : 20.00; 
 
-      const totalAmount = subTotal + shippingCost;
-      const orderNumber = 'ORD-' + crypto.randomBytes(4).toString('hex').toUpperCase();
+        const totalAmount = subTotal + shippingCost;
+        const orderNumber = 'ORD-' + crypto.randomBytes(4).toString('hex').toUpperCase();
 
-      const order = await prisma.$transaction(async (tx) => {
+        // Create Final Order
         const newOrder = await tx.order.create({
           data: {
             orderNumber, 
             userId, 
-            shippingAddressId, 
+            shippingAddressId: finalAddressId, 
             subTotal, 
             shippingCost, 
             totalAmount,
@@ -58,11 +82,12 @@ class OrderService {
           }
         });
 
+        // Clear Cart
         await tx.cartItem.deleteMany({ where: { cartId: cart.id } });
+        
         return newOrder;
       });
 
-      return order;
     } catch (error) {
       throw new Error(`Failed to create order: ${error.message}`);
     }

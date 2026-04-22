@@ -4,14 +4,34 @@ class OrderController {
   async createOrder(req, res) {
     try {
       const userId = req.user.id;
-      const { shippingAddressId } = req.body;
+      const { shippingAddressId, newAddress, paymentMethod } = req.body;
 
-      if (!shippingAddressId) {
-        return res.status(400).json({ success: false, error: 'Shipping address ID is required.' });
+      if (!shippingAddressId && !newAddress) {
+        return res.status(400).json({ 
+          success: false, 
+          error: 'Please provide either an existing shippingAddressId or a newAddress object.' 
+        });
+      }
+
+      if (newAddress && !shippingAddressId) {
+        const requiredFields = ['street', 'city', 'state', 'zipCode'];
+        for (const field of requiredFields) {
+          if (!newAddress[field]) {
+            return res.status(400).json({ 
+              success: false, 
+              error: `New address is missing required field: ${field}` 
+            });
+          }
+        }
       }
 
       const order = await orderService.createOrder(userId, req.body);
-      res.status(201).json({ success: true, message: 'Order created', data: order });
+      
+      res.status(201).json({ 
+        success: true, 
+        message: 'Order created successfully', 
+        data: order 
+      });
     } catch (error) {
       res.status(400).json({ success: false, error: error.message });
     }
