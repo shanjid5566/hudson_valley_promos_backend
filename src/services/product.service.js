@@ -86,12 +86,18 @@ class ProductService {
     }
   }
 
-  async getAllProducts(page = 1, limit = 10, search = '', serviceId = null) {
+  async getAllProducts(page = 1, limit = 10, filters = {}) {
     try {
       const offset = (page - 1) * limit;
       const where = {};
 
-      if (search && search.trim()) {
+      // Support both old params (for backward compatibility) and new filters object
+      const search = filters.search || filters;
+      const serviceId = filters.serviceId;
+      const categoryId = filters.categoryId;
+      const subcategoryId = filters.subcategoryId;
+
+      if (search && typeof search === 'string' && search.trim()) {
         where.OR = [
           { name: { contains: search, mode: 'insensitive' } },
           { description: { contains: search, mode: 'insensitive' } }
@@ -102,6 +108,14 @@ class ProductService {
         where.category = {
           serviceId
         };
+      }
+
+      if (categoryId && categoryId !== 'ALL') {
+        where.categoryId = categoryId;
+      }
+
+      if (subcategoryId && subcategoryId !== 'ALL') {
+        where.subcategoryId = subcategoryId;
       }
 
       const products = await prisma.product.findMany({
@@ -187,7 +201,29 @@ class ProductService {
         throw new Error('Product not found');
       }
 
-      return product;
+      // Fetch customization steps for this product's category
+      let customizationSteps = null;
+      if (product.categoryId && product.category) {
+        customizationSteps = await prisma.productStepConfiguration.findUnique({
+          where: {
+            serviceId_categoryId: {
+              serviceId: product.category.service.id,
+              categoryId: product.categoryId
+            }
+          },
+          include: {
+            steps: {
+              include: { options: true },
+              orderBy: { stepOrder: 'asc' }
+            }
+          }
+        });
+      }
+
+      return {
+        ...product,
+        customizationSteps: customizationSteps || null
+      };
     } catch (error) {
       throw new Error(`Failed to fetch product: ${error.message}`);
     }

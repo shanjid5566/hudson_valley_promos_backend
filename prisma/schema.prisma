@@ -486,6 +486,7 @@ description String?    @db.Text
 icon        String?    // Icon URL or class name
 
 categories  Category[] // Direct categories under this service
+stepConfigurations ProductStepConfiguration[]
 
 createdAt   DateTime   @default(now())
 updatedAt   DateTime   @updatedAt
@@ -507,6 +508,7 @@ products      Product[]
 
 // Relation to dynamic product attributes
 attributes    ProductAttribute[]
+stepConfigurations ProductStepConfiguration[]
 
 createdAt   DateTime @default(now())
 updatedAt   DateTime @updatedAt
@@ -646,6 +648,61 @@ createdAt   DateTime @default(now())
 updatedAt   DateTime @updatedAt
 
 @@index([attributeId])
+}
+
+// ==========================================
+// Product Customization Steps (Form Builder)
+// ==========================================
+
+model ProductStepConfiguration {
+id          String   @id @default(uuid())
+serviceId   String
+service     Service  @relation(fields: [serviceId], references: [id], onDelete: Cascade)
+categoryId  String
+category    Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+steps       ProductStep[]
+
+createdAt   DateTime @default(now())
+updatedAt   DateTime @updatedAt
+
+@@unique([serviceId, categoryId])
+@@index([serviceId])
+@@index([categoryId])
+}
+
+model ProductStep {
+id              String   @id @default(uuid())
+configurationId String
+configuration   ProductStepConfiguration @relation(fields: [configurationId], references: [id], onDelete: Cascade)
+
+stepTitle       String
+inputType       String   // FILE_UPLOAD, RADIO, CHECKBOX, DROPDOWN, PILLS, COLOR_SWATCHES, TEXT_INPUT, TEXT_AREA
+isRequired      Boolean  @default(true)
+stepOrder       Int      @default(0)
+
+options         ProductStepOption[]
+
+createdAt       DateTime @default(now())
+updatedAt       DateTime @updatedAt
+
+@@index([configurationId])
+}
+
+model ProductStepOption {
+id              String   @id @default(uuid())
+stepId          String
+step            ProductStep @relation(fields: [stepId], references: [id], onDelete: Cascade)
+
+optionValue     String
+subtext         String?
+colorHex        String?
+optionOrder     Int      @default(0)
+
+createdAt       DateTime @default(now())
+updatedAt       DateTime @updatedAt
+
+@@index([stepId])
 }
 
 // STREAMING_CHUNK: E-commerce Core logic (Cart & Orders)...

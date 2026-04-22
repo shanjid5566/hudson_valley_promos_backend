@@ -63,10 +63,15 @@ class ProductController {
     try {
       const page = Math.max(1, parseInt(req.query.page) || 1);
       const limit = Math.max(1, Math.min(100, parseInt(req.query.limit) || 10));
-      const search = req.query.search || '';
-      const serviceId = req.query.serviceId || null;
 
-      const result = await productService.getAllProducts(page, limit, search, serviceId);
+      const filters = {
+        search: req.query.search || '',
+        serviceId: req.query.serviceId || null,
+        categoryId: req.query.categoryId || null,
+        subcategoryId: req.query.subcategoryId || null
+      };
+
+      const result = await productService.getAllProducts(page, limit, filters);
 
       res.status(200).json({
         success: true,

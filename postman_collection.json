@@ -203,7 +203,7 @@
       ]
     },
     {
-      "name": "Users",
+      "name": "Authentication",
       "item": [
         {
           "name": "Auth - Register Customer",
@@ -660,7 +660,7 @@
                   }
                 ],
                 "url": {
-                  "raw": "{{base_url}}/api/admin/products?page=1&limit=10&search=&serviceId=ALL",
+                  "raw": "{{base_url}}/api/admin/products?page=1&limit=10&search=&serviceId=ALL&categoryId=&subcategoryId=",
                   "host": [
                     "{{base_url}}"
                   ],
@@ -681,16 +681,31 @@
                     {
                       "key": "search",
                       "value": "",
-                      "description": "Search by product name or description"
+                      "description": "Search by product name or description",
+                      "disabled": false
                     },
                     {
                       "key": "serviceId",
                       "value": "ALL",
-                      "description": "Filter by service ID, or use 'ALL' for all services"
+                      "description": "Filter by service ID, or use 'ALL' for all services",
+                      "disabled": false
+                    },
+                    {
+                      "key": "categoryId",
+                      "value": "",
+                      "description": "Filter by category ID, or use 'ALL' for all categories",
+                      "disabled": true
+                    },
+                    {
+                      "key": "subcategoryId",
+                      "value": "",
+                      "description": "Filter by subcategory ID, or use 'ALL' for all subcategories",
+                      "disabled": true
                     }
                   ]
                 }
-              }
+              },
+              "description": "Get all admin products with filters: search, serviceId, categoryId, subcategoryId, pagination"
             },
             {
               "name": "Get Product by ID",
@@ -1439,6 +1454,232 @@
                   ]
                 }
               }
+            }
+          ]
+        },
+        {
+          "name": "Product Steps Configuration",
+          "item": [
+            {
+              "name": "Get All Configurations",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{adminToken}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/admin/product-steps?page=1&limit=10&serviceId=&categoryId=",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "admin",
+                    "product-steps"
+                  ],
+                  "query": [
+                    {
+                      "key": "page",
+                      "value": "1"
+                    },
+                    {
+                      "key": "limit",
+                      "value": "10"
+                    },
+                    {
+                      "key": "serviceId",
+                      "value": "",
+                      "disabled": true
+                    },
+                    {
+                      "key": "categoryId",
+                      "value": "",
+                      "disabled": true
+                    }
+                  ]
+                }
+              },
+              "description": "Get all product step configurations with pagination and optional filters"
+            },
+            {
+              "name": "Get Configuration by ID",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{adminToken}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/admin/product-steps/{{configurationId}}",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "admin",
+                    "product-steps",
+                    "{{configurationId}}"
+                  ]
+                }
+              },
+              "description": "Get single product step configuration by ID with all steps and options"
+            },
+            {
+              "name": "Get by Service & Category",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{adminToken}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/admin/product-steps/service/{{serviceId}}/category/{{categoryId}}",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "admin",
+                    "product-steps",
+                    "service",
+                    "{{serviceId}}",
+                    "category",
+                    "{{categoryId}}"
+                  ]
+                }
+              },
+              "description": "Get configuration for a specific service and category combination"
+            },
+            {
+              "name": "Create Configuration",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{adminToken}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"serviceId\": \"{{serviceId}}\",\n  \"categoryId\": \"{{categoryId}}\",\n  \"steps\": [\n    {\n      \"stepTitle\": \"Upload Artwork\",\n      \"inputType\": \"FILE_UPLOAD\",\n      \"isRequired\": true,\n      \"stepOrder\": 1,\n      \"options\": []\n    },\n    {\n      \"stepTitle\": \"Print Location\",\n      \"inputType\": \"RADIO\",\n      \"isRequired\": true,\n      \"stepOrder\": 2,\n      \"options\": [\n        {\n          \"optionValue\": \"Front Only\",\n          \"subtext\": \"Standard placement\",\n          \"optionOrder\": 1\n        },\n        {\n          \"optionValue\": \"Back Only\",\n          \"optionOrder\": 2\n        },\n        {\n          \"optionValue\": \"Full Wrap\",\n          \"optionOrder\": 3\n        }\n      ]\n    },\n    {\n      \"stepTitle\": \"Color Choice\",\n      \"inputType\": \"COLOR_SWATCHES\",\n      \"isRequired\": true,\n      \"stepOrder\": 3,\n      \"options\": [\n        {\n          \"optionValue\": \"Black\",\n          \"colorHex\": \"#000000\",\n          \"optionOrder\": 1\n        },\n        {\n          \"optionValue\": \"White\",\n          \"colorHex\": \"#FFFFFF\",\n          \"optionOrder\": 2\n        }\n      ]\n    }\n  ]\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/admin/product-steps",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "admin",
+                    "product-steps"
+                  ]
+                }
+              },
+              "description": "Create new product step configuration with steps and options"
+            },
+            {
+              "name": "Update Configuration",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{adminToken}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"steps\": [\n    {\n      \"stepTitle\": \"Upload Artwork\",\n      \"inputType\": \"FILE_UPLOAD\",\n      \"isRequired\": true,\n      \"stepOrder\": 1,\n      \"options\": []\n    },\n    {\n      \"stepTitle\": \"Select Print Location\",\n      \"inputType\": \"RADIO\",\n      \"isRequired\": true,\n      \"stepOrder\": 2,\n      \"options\": [\n        {\n          \"optionValue\": \"Front Only\",\n          \"optionOrder\": 1\n        },\n        {\n          \"optionValue\": \"Back Only\",\n          \"optionOrder\": 2\n        }\n      ]\n    }\n  ]\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/admin/product-steps/{{configurationId}}",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "admin",
+                    "product-steps",
+                    "{{configurationId}}"
+                  ]
+                }
+              },
+              "description": "Update product step configuration (replaces all steps)"
+            },
+            {
+              "name": "Reorder Steps",
+              "request": {
+                "method": "PATCH",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{adminToken}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"steps\": [\n    {\n      \"stepId\": \"{{stepId1}}\",\n      \"stepOrder\": 1\n    },\n    {\n      \"stepId\": \"{{stepId2}}\",\n      \"stepOrder\": 2\n    },\n    {\n      \"stepId\": \"{{stepId3}}\",\n      \"stepOrder\": 3\n    }\n  ]\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/admin/product-steps/{{configurationId}}/reorder",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "admin",
+                    "product-steps",
+                    "{{configurationId}}",
+                    "reorder"
+                  ]
+                }
+              },
+              "description": "Reorder steps within a configuration"
+            },
+            {
+              "name": "Delete Configuration",
+              "request": {
+                "method": "DELETE",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{adminToken}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/admin/product-steps/{{configurationId}}",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "admin",
+                    "product-steps",
+                    "{{configurationId}}"
+                  ]
+                }
+              },
+              "description": "Delete entire product step configuration and all related steps/options"
             }
           ]
         },

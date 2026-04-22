@@ -33,6 +33,7 @@ const adminOrdersRoutes = require('./routes/orders.routes');
 const adminDashboardRoutes = require('./routes/dashboard.routes');
 const adminSubcategoriesController = require('./controllers/subcategories.controller');
 const adminAttributesRoutes = require('./routes/attributes.routes');
+const productStepsRoutes = require('./routes/productSteps.routes');
 const productRoutes = require('./routes/product.routes');
 
 // Use routes
@@ -44,6 +45,7 @@ app.use('/api/admin/categories', adminCategoriesRoutes);
 app.use('/api/admin/subcategories', adminSubcategoriesRoutes);
 app.use('/api/admin/pricing-rules', adminPricingRulesRoutes);
 app.use('/api/admin/attributes', adminAttributesRoutes);
+app.use('/api/admin/product-steps', productStepsRoutes);
 app.use('/api/admin/orders', adminOrdersRoutes);
 app.use('/api/admin/dashboard', adminDashboardRoutes);
 
