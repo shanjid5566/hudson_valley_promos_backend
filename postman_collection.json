@@ -203,6 +203,174 @@
       ]
     },
     {
+      "name": "User",
+      "item": [
+        {
+          "name": "Cart",
+          "item": [
+            {
+              "name": "Get Cart",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "if (pm.response.code === 200) {",
+                      "  const response = pm.response.json();",
+                      "  if (response.data && response.data.items && response.data.items.length > 0) {",
+                      "    pm.environment.set('cartItemId', response.data.items[0].id);",
+                      "  }",
+                      "}"
+                    ],
+                    "type": "javascript"
+                  }
+                }
+              ],
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{userToken}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/user/cart",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "user",
+                    "cart"
+                  ]
+                }
+              },
+              "description": "Get user's cart with all items and product details. Automatically sets cartItemId variable to first item ID."
+            },
+            {
+              "name": "Add to Cart",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{userToken}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"productId\": \"{{productId}}\",\n  \"quantity\": 1,\n  \"customizationDetails\": {\n    \"color\": \"Black\",\n    \"size\": \"M\",\n    \"printLocation\": \"Front\",\n    \"uploadedFile\": \"artwork.png\"\n  }\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/user/cart/add",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "user",
+                    "cart",
+                    "add"
+                  ]
+                }
+              },
+              "description": "Add product to cart with quantity and optional customization details (artwork, color, size, etc.)"
+            },
+            {
+              "name": "Update Cart Item",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{userToken}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"quantity\": 3\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/user/cart/item/{{cartItemId}}",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "user",
+                    "cart",
+                    "item",
+                    "{{cartItemId}}"
+                  ]
+                }
+              },
+              "description": "Update quantity of a specific cart item"
+            },
+            {
+              "name": "Remove Cart Item",
+              "request": {
+                "method": "DELETE",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{userToken}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/user/cart/item/{{cartItemId}}",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "user",
+                    "cart",
+                    "item",
+                    "{{cartItemId}}"
+                  ]
+                }
+              },
+              "description": "Remove a specific item from cart"
+            },
+            {
+              "name": "Clear Cart",
+              "request": {
+                "method": "DELETE",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{userToken}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/user/cart/clear",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "user",
+                    "cart",
+                    "clear"
+                  ]
+                }
+              },
+              "description": "Clear entire user cart - remove all items"
+            }
+          ]
+        }
+      ]
+    },
+    {
       "name": "Authentication",
       "item": [
         {
@@ -290,7 +458,7 @@
           }
         },
         {
-          "name": "Auth - Login",
+          "name": "Auth - Login Admin",
           "event": [
             {
               "listen": "test",
@@ -331,7 +499,53 @@
                 "login"
               ]
             }
-          }
+          },
+          "description": "Login as admin user. Sets adminToken variable automatically."
+        },
+        {
+          "name": "Auth - Login User",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "  const jsonData = pm.response.json();",
+                  "  if (jsonData.data && jsonData.data.token) {",
+                  "    pm.collectionVariables.set('userToken', jsonData.data.token);",
+                  "  }",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"customer@example.com\",\n  \"password\": \"Customer@123456\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/users/auth/login",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "users",
+                "auth",
+                "login"
+              ]
+            }
+          },
+          "description": "Login as verified customer user. Sets userToken variable automatically."
         },
         {
           "name": "Auth - Forgot Password",
@@ -2094,6 +2308,16 @@
     },
     {
       "key": "productId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "userToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "cartItemId",
       "value": "",
       "type": "string"
     }

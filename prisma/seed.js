@@ -83,6 +83,49 @@ async function main() {
     console.log('  Password:', adminPassword);
     console.log('\n⚠️  IMPORTANT: Change this password after first login!');
 
+    // Verified customer user
+    const customerEmail = 'customer@example.com';
+    const customerPassword = 'Customer@123456';
+    const customerFirstName = 'John';
+    const customerLastName = 'Doe';
+
+    console.log('\n🔐 Hashing customer password...');
+    const hashedCustomerPassword = await bcrypt.hash(customerPassword, 10);
+
+    console.log('🔍 Checking if customer exists...');
+    const existingCustomer = await prisma.user.findUnique({
+      where: { email: customerEmail },
+    });
+
+    if (existingCustomer) {
+      console.log('✓ Customer user already exists:', customerEmail);
+    } else {
+      // Create new verified customer user
+      console.log('👤 Creating new verified customer user...');
+      const customer = await prisma.user.create({
+        data: {
+          email: customerEmail,
+          password: hashedCustomerPassword,
+          firstName: customerFirstName,
+          lastName: customerLastName,
+          role: 'CUSTOMER',
+          isEmailVerified: true, // Customer email is verified
+          phone: '+1987654321',
+        },
+      });
+
+      console.log('✓ Customer user created successfully!');
+      console.log('  Email:', customer.email);
+      console.log('  Name:', `${customer.firstName} ${customer.lastName}`);
+      console.log('  Role:', customer.role);
+      console.log('  Email Verified:', customer.isEmailVerified);
+      console.log('  ID:', customer.id);
+    }
+
+    console.log('\n📧 Default Customer Credentials:');
+    console.log('  Email:', customerEmail);
+    console.log('  Password:', customerPassword);
+
     console.log('\n✅ Seed completed successfully!');
   } catch (error) {
     console.error('❌ Error seeding database:', error.message);
