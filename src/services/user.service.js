@@ -402,12 +402,18 @@ class UserService {
   /**
    * Update an existing user
    * @param {string} id - User ID
-   * @param {Object} userData - Updated user data
+   * @param {Object} userData - Updated user data (email is excluded from updates)
    * @returns {Promise<Object>} Updated user object
    */
   async updateUser(id, userData) {
     try {
       const updateData = { ...userData };
+
+      // Remove email from update (email is immutable)
+      delete updateData.email;
+      
+      // Remove role from update (only admins can change roles, and that should be a separate operation)
+      delete updateData.role;
 
       // Hash password if provided
       if (updateData.password) {

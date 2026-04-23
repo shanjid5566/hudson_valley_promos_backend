@@ -60,8 +60,8 @@ router.get('/:id', verifyUserOrAdminToken, userController.getUserById.bind(userC
 // POST create new user
 router.post('/', verifyAdminToken, userController.createUser.bind(userController));
 
-// PUT update existing user
-router.put('/:id', verifyAdminToken, userController.updateUser.bind(userController));
+// PUT update existing user (users can update their own profile, admins can update any user)
+router.put('/:id', verifyUserOrAdminToken, userController.updateUser.bind(userController));
 
 // PUT change password for authenticated user or admin
 router.put('/change-password', verifyUserOrAdminToken, userController.changePassword.bind(userController));

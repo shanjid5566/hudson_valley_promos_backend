@@ -272,11 +272,29 @@ class UserController {
   /**
    * Update existing user
    * @route PUT /api/users/:id
+   * Authorization: Regular users can only update their own profile, admins can update any user
+   * Restriction: Email cannot be changed by anyone
    */
   async updateUser(req, res, next) {
     try {
       const { id } = req.params;
       const userData = req.body;
+      
+      // Check authorization: regular users can only update their own profile
+      if (req.user.role !== 'ADMIN' && req.user.id !== id) {
+        return res.status(403).json({
+          success: false,
+          error: 'You do not have permission to update this user profile'
+        });
+      }
+      
+      // Prevent email from being changed
+      if (userData.email) {
+        return res.status(400).json({
+          success: false,
+          error: 'Email cannot be changed'
+        });
+      }
       
       const updatedUser = await userService.updateUser(id, userData);
       
