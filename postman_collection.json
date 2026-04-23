@@ -196,7 +196,7 @@
                   ]
                 }
               },
-              "description": "Get individual product details including pricing tiers and attributes."
+              "description": "Get individual product details including pricing tiers, attributes, customization steps, and approved reviews with average rating."
             }
           ]
         }

@@ -220,9 +220,40 @@ class ProductService {
         });
       }
 
+      // Fetch approved reviews for this product
+      const reviews = await prisma.review.findMany({
+        where: {
+          productId: id,
+          isApproved: true
+        },
+        select: {
+          id: true,
+          rating: true,
+          comment: true,
+          createdAt: true,
+          user: {
+            select: {
+              firstName: true,
+              lastName: true
+            }
+          }
+        },
+        orderBy: { createdAt: 'desc' }
+      });
+
+      // Calculate average rating
+      const averageRating = reviews.length > 0
+        ? (reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length).toFixed(1)
+        : 0;
+
       return {
         ...product,
-        customizationSteps: customizationSteps || null
+        customizationSteps: customizationSteps || null,
+        reviews: {
+          items: reviews,
+          averageRating: parseFloat(averageRating),
+          totalReviews: reviews.length
+        }
       };
     } catch (error) {
       throw new Error(`Failed to fetch product: ${error.message}`);
