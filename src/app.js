@@ -37,7 +37,7 @@ const productStepsRoutes = require("./routes/productSteps.routes");
 const productRoutes = require("./routes/product.routes");
 const cartRoutes = require("./routes/cart.routes");
 const checkoutRoutes = require("./routes/checkout.routes");
-const orderRoutes = require("./routes/order.routes");
+const orderRoutes = require("./routes/userOrder.routes");
 const paymentRoutes = require("./routes/payment.routes");
 
 // Use routes
