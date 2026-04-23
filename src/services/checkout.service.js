@@ -21,9 +21,11 @@ class CheckoutService {
       }
 
       const savedAddresses = await prisma.address.findMany({
-        where: { userId },
+        where: { 
+          userId: userId,
+          isDefault: true 
+        },
         orderBy: [
-          { isDefault: 'desc' }, 
           { createdAt: 'desc' }
         ]
       });

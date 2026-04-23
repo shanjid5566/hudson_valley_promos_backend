@@ -605,6 +605,137 @@
               "description": "Submit a review for a purchased product. Rating must be between 1-5. Can only review products from completed orders that you haven't reviewed yet."
             }
           ]
+        },
+        {
+          "name": "Addresses",
+          "item": [
+            {
+              "name": "Get User Addresses",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{userToken}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/users/addresses",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "users",
+                    "addresses"
+                  ]
+                }
+              },
+              "description": "Get all addresses for the logged-in user. Returns billing and shipping addresses ordered by most recent."
+            },
+            {
+              "name": "Create Address",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{userToken}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"type\": \"SHIPPING\",\n  \"company\": \"Acme Corp\",\n  \"street\": \"123 Main Street\",\n  \"city\": \"New York\",\n  \"state\": \"NY\",\n  \"zipCode\": \"10001\",\n  \"isDefault\": true\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/users/addresses",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "users",
+                    "addresses"
+                  ]
+                }
+              },
+              "description": "Create a new address for the user. Type must be BILLING or SHIPPING. If isDefault is true, other addresses of the same type will be set to non-default."
+            },
+            {
+              "name": "Update Address",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{userToken}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"company\": \"Updated Company Name\",\n  \"street\": \"456 Oak Avenue\",\n  \"city\": \"Los Angeles\",\n  \"state\": \"CA\",\n  \"zipCode\": \"90001\",\n  \"isDefault\": false\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/users/addresses/:id",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "users",
+                    "addresses",
+                    ":id"
+                  ],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "address-id-here"
+                    }
+                  ]
+                }
+              },
+              "description": "Update an existing address. Only the user who owns the address can update it. All fields are optional."
+            },
+            {
+              "name": "Delete Address",
+              "request": {
+                "method": "DELETE",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{userToken}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/users/addresses/:id",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "users",
+                    "addresses",
+                    ":id"
+                  ],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "address-id-here"
+                    }
+                  ]
+                }
+              },
+              "description": "Delete an address. Only the user who owns the address can delete it."
+            }
+          ]
         }
       ]
     },

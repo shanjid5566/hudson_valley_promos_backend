@@ -40,8 +40,11 @@ const checkoutRoutes = require("./routes/checkout.routes");
 const orderRoutes = require("./routes/userOrder.routes");
 const paymentRoutes = require("./routes/payment.routes");
 const reviewRoutes = require('./routes/review.routes');
+const addressRoutes = require('./routes/address.routes');
 
 // Use routes
+// Note: More specific routes must come before general routes
+app.use('/api/users/addresses', addressRoutes); // Must come before /api/users
 app.use("/api/users", userRoutes);
 app.use("/api/products", productsPublicRoutes);
 app.use("/api/admin/products", productRoutes);
