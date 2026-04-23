@@ -401,6 +401,31 @@
           "name": "Order",
           "item": [
             {
+              "name": "Get My Orders",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{userToken}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/user/order/my-orders",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "user",
+                    "order",
+                    "my-orders"
+                  ]
+                }
+              },
+              "description": "Get all orders for the logged-in user. Returns orders with shipping address, payment status, and order items."
+            },
+            {
               "name": "Create Order",
               "event": [
                 {
@@ -518,6 +543,66 @@
                 }
               },
               "description": "Verify Stripe payment session and fulfill order if payment successful"
+            }
+          ]
+        },
+        {
+          "name": "Reviews",
+          "item": [
+            {
+              "name": "Get Pending Reviews",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{userToken}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/reviews/pending",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "reviews",
+                    "pending"
+                  ]
+                }
+              },
+              "description": "Get all products purchased by the user that are eligible for review. Only shows products from completed orders that haven't been reviewed yet."
+            },
+            {
+              "name": "Submit Review",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{userToken}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"productId\": \"{{productId}}\",\n  \"rating\": 5,\n  \"comment\": \"Great quality product! Very satisfied with my purchase.\"\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/reviews",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "reviews"
+                  ]
+                }
+              },
+              "description": "Submit a review for a purchased product. Rating must be between 1-5. Can only review products from completed orders that you haven't reviewed yet."
             }
           ]
         }

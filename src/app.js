@@ -39,6 +39,7 @@ const cartRoutes = require("./routes/cart.routes");
 const checkoutRoutes = require("./routes/checkout.routes");
 const orderRoutes = require("./routes/userOrder.routes");
 const paymentRoutes = require("./routes/payment.routes");
+const reviewRoutes = require('./routes/review.routes');
 
 // Use routes
 app.use("/api/users", userRoutes);
@@ -56,6 +57,7 @@ app.use("/api/user/cart", cartRoutes);
 app.use("/api/user/checkout", checkoutRoutes);
 app.use("/api/user/order", orderRoutes);
 app.use("/api/user/payment", paymentRoutes);
+app.use('/api/reviews', reviewRoutes);
 
 // Nested route: Get subcategories of a specific category
 app.get(
