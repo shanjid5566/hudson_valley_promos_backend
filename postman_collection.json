@@ -199,6 +199,38 @@
               "description": "Get individual product details including pricing tiers, attributes, customization steps, and approved reviews with average rating."
             }
           ]
+        },
+        {
+          "name": "Contact",
+          "item": [
+            {
+              "name": "Submit Contact Form",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"fullName\": \"John Doe\",\n  \"email\": \"john@example.com\",\n  \"phone\": \"(845) 000-0000\",\n  \"projectType\": \"Promotional Products\",\n  \"message\": \"I'm interested in ordering custom promotional products for my business. Please contact me to discuss options.\"\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/contact",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "contact"
+                  ]
+                }
+              },
+              "description": "Submit contact form. Sends email to client and auto-reply to customer. Valid project types: Promotional Products, Custom Apparel, Signage, Awards & Plaques, Screen Printing, Embroidery, Other."
+            }
+          ]
         }
       ]
     },
