@@ -586,15 +586,40 @@ FIXED
 PERCENTAGE
 }
 
-model PricingRule {
-id          String          @id @default(uuid())
-name        String          @unique
-type        PricingRuleType @default(FIXED)
-value       Decimal         @db.Decimal(10, 2)
-description String?         @db.Text
+// When should this rule be applied?
+enum PricingRuleApplication {
+PER_ORDER           // Applied once per order (e.g., Shipping)
+PER_ITEM            // Applied to each cart item (e.g., Per-item fee)
+ON_SUBTOTAL         // Applied to order subtotal (e.g., Tax, Printing fee)
+}
 
-createdAt   DateTime @default(now())
-updatedAt   DateTime @updatedAt
+// What does this rule apply to?
+enum PricingRuleScope {
+ORDER_TOTAL         // Apply to final order total
+SUBTOTAL            // Apply to items subtotal only
+}
+
+model PricingRule {
+id          String                   @id @default(uuid())
+name        String                   @unique
+type        PricingRuleType          @default(FIXED)
+value       Decimal                  @db.Decimal(10, 2)
+description String?                  @db.Text
+
+// Enhanced fields for dynamic application
+application PricingRuleApplication  @default(PER_ORDER)
+scope       PricingRuleScope         @default(ORDER_TOTAL)
+isActive    Boolean                  @default(true)
+
+// JSON field for conditional logic
+// Example: { "hasCustomization": true, "minQuantity": 10, "minAmount": 100 }
+conditions  Json?
+
+// Priority for applying multiple rules (lower number = higher priority)
+priority    Int                      @default(0)
+
+createdAt   DateTime                 @default(now())
+updatedAt   DateTime                 @updatedAt
 }
 
 // STREAMING_CHUNK: Dynamic Form Builder models with updates...

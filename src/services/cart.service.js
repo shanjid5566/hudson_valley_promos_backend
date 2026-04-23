@@ -1,4 +1,5 @@
 const prisma = require('../utils/prisma');
+const { calculateItemPrice, calculateOrderPricing } = require('../utils/pricing');
 
 class CartService {
   async getCartByUserId(userId) {
@@ -14,6 +15,9 @@ class CartService {
                   name: true,
                   basePrice: true,
                   images: true,
+                  pricingTiers: {
+                    orderBy: { minQuantity: 'asc' }
+                  },
                   category: {
                     select: { name: true }
                   }
@@ -32,6 +36,26 @@ class CartService {
         });
       }
 
+      // Calculate pricing for each item
+      if (cart.items && cart.items.length > 0) {
+        cart.items = cart.items.map(item => {
+          const pricing = calculateItemPrice(item.product, item.quantity);
+          return {
+            ...item,
+            unitPrice: pricing.unitPrice,
+            itemSubtotal: pricing.itemSubtotal
+          };
+        });
+
+        // Calculate order totals with all fees
+        const hasCustomization = cart.items.some(
+          item => item.customizationDetails && Object.keys(item.customizationDetails).length > 0
+        );
+
+        const orderPricing = await calculateOrderPricing(cart.items, { hasCustomization });
+        cart.pricing = orderPricing;
+      }
+
       return cart;
     } catch (error) {
       throw new Error(`Failed to fetch cart: ${error.message}`);
@@ -40,7 +64,15 @@ class CartService {
 
   async addToCart(userId, productId, quantity, customizationDetails = {}) {
     try {
-      const product = await prisma.product.findUnique({ where: { id: productId } });
+      const product = await prisma.product.findUnique({ 
+        where: { id: productId },
+        include: {
+          pricingTiers: {
+            orderBy: { minQuantity: 'asc' }
+          }
+        }
+      });
+      
       if (!product) {
         throw new Error('Product not found');
       }
@@ -67,11 +99,19 @@ class CartService {
               id: true,
               name: true,
               basePrice: true,
-              images: true
+              images: true,
+              pricingTiers: {
+                orderBy: { minQuantity: 'asc' }
+              }
             }
           }
         }
       });
+
+      // Calculate pricing for the added item
+      const pricing = calculateItemPrice(cartItem.product, cartItem.quantity);
+      cartItem.unitPrice = pricing.unitPrice;
+      cartItem.itemSubtotal = pricing.itemSubtotal;
 
       return cartItem;
     } catch (error) {
@@ -95,10 +135,22 @@ class CartService {
         data: { quantity: parseInt(quantity, 10) },
         include: {
           product: {
-            select: { id: true, name: true, basePrice: true }
+            select: {
+              id: true,
+              name: true,
+              basePrice: true,
+              pricingTiers: {
+                orderBy: { minQuantity: 'asc' }
+              }
+            }
           }
         }
       });
+
+      // Calculate pricing for updated quantity
+      const pricing = calculateItemPrice(updatedItem.product, updatedItem.quantity);
+      updatedItem.unitPrice = pricing.unitPrice;
+      updatedItem.itemSubtotal = pricing.itemSubtotal;
 
       return updatedItem;
     } catch (error) {

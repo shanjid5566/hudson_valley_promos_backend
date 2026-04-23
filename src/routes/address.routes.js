@@ -14,3 +14,4 @@ router.put('/:id', verifyUserOrAdminToken, addressController.updateAddress.bind(
 router.delete('/:id', verifyUserOrAdminToken, addressController.deleteAddress.bind(addressController));
 
 module.exports = router;
+
