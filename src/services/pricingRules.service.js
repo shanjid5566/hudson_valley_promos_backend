@@ -57,11 +57,21 @@ class AdminPricingRulesService {
 
   /**
    * Create new pricing rule
+   * Auto-generates priority based on existing rules (ignored if provided)
    * @param {Object} ruleData - Pricing rule data
    * @returns {Promise<Object>} Created pricing rule
    */
   async createPricingRule(ruleData) {
-    const { name, type, value, description } = ruleData;
+    const { 
+      name, 
+      type, 
+      value, 
+      description, 
+      application, 
+      scope, 
+      isActive, 
+      conditions
+    } = ruleData;
 
     try {
       // Check if rule name already exists
@@ -78,17 +88,41 @@ class AdminPricingRulesService {
         throw new Error('Type must be either FIXED or PERCENTAGE');
       }
 
+      // Validate application if provided
+      const validApplications = ['PER_ORDER', 'PER_ITEM', 'ON_SUBTOTAL', 'CONDITIONAL'];
+      if (application && !validApplications.includes(application)) {
+        throw new Error(`Application must be one of: ${validApplications.join(', ')}`);
+      }
+
+      // Validate scope if provided
+      const validScopes = ['ORDER_TOTAL', 'SUBTOTAL', 'TOTAL_QUANTITY', 'PER_PRODUCT'];
+      if (scope && !validScopes.includes(scope)) {
+        throw new Error(`Scope must be one of: ${validScopes.join(', ')}`);
+      }
+
       // Validate value
       if (isNaN(value) || value < 0) {
         throw new Error('Value must be a positive number');
       }
+
+      // Auto-generate priority: find highest priority and add 10
+      const lastRule = await prisma.pricingRule.findFirst({
+        orderBy: { priority: 'desc' },
+        select: { priority: true }
+      });
+      const autoPriority = lastRule ? lastRule.priority + 10 : 0;
 
       const rule = await prisma.pricingRule.create({
         data: {
           name: name.trim(),
           type,
           value: parseFloat(value),
-          description: description || null
+          description: description || null,
+          application: application || 'PER_ORDER',
+          scope: scope || 'ORDER_TOTAL',
+          isActive: isActive !== undefined ? isActive : true,
+          conditions: conditions || null,
+          priority: autoPriority  // Auto-generated, user input ignored
         }
       });
 
@@ -105,7 +139,17 @@ class AdminPricingRulesService {
    * @returns {Promise<Object>} Updated pricing rule
    */
   async updatePricingRule(id, ruleData) {
-    const { name, type, value, description } = ruleData;
+    const { 
+      name, 
+      type, 
+      value, 
+      description, 
+      application, 
+      scope, 
+      isActive, 
+      conditions, 
+      priority 
+    } = ruleData;
 
     try {
       // Check if name already exists (if being changed)
@@ -127,19 +171,37 @@ class AdminPricingRulesService {
         throw new Error('Type must be either FIXED or PERCENTAGE');
       }
 
+      // Validate application if provided
+      const validApplications = ['PER_ORDER', 'PER_ITEM', 'ON_SUBTOTAL', 'CONDITIONAL'];
+      if (application && !validApplications.includes(application)) {
+        throw new Error(`Application must be one of: ${validApplications.join(', ')}`);
+      }
+
+      // Validate scope if provided
+      const validScopes = ['ORDER_TOTAL', 'SUBTOTAL', 'TOTAL_QUANTITY', 'PER_PRODUCT'];
+      if (scope && !validScopes.includes(scope)) {
+        throw new Error(`Scope must be one of: ${validScopes.join(', ')}`);
+      }
+
       // Validate value if provided
       if (value !== undefined && (isNaN(value) || value < 0)) {
         throw new Error('Value must be a positive number');
       }
 
+      const updateData = {};
+      if (name) updateData.name = name.trim();
+      if (type) updateData.type = type;
+      if (value !== undefined) updateData.value = parseFloat(value);
+      if (description !== undefined) updateData.description = description;
+      if (application) updateData.application = application;
+      if (scope) updateData.scope = scope;
+      if (isActive !== undefined) updateData.isActive = isActive;
+      if (conditions !== undefined) updateData.conditions = conditions;
+      if (priority !== undefined) updateData.priority = priority;
+
       const rule = await prisma.pricingRule.update({
         where: { id },
-        data: {
-          ...(name && { name: name.trim() }),
-          ...(type && { type }),
-          ...(value !== undefined && { value: parseFloat(value) }),
-          ...(description !== undefined && { description })
-        }
+        data: updateData
       });
 
       return rule;

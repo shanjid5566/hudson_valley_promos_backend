@@ -1,5 +1,6 @@
 const prisma = require("../utils/prisma");
 const crypto = require("crypto");
+const { calculateItemPrice, calculateOrderPricing } = require("../utils/pricing");
 
 class OrderService {
   async getUserOrders(userId) {
@@ -43,7 +44,19 @@ class OrderService {
     try {
       const cart = await prisma.cart.findUnique({
         where: { userId },
-        include: { items: { include: { product: true } } },
+        include: { 
+          items: { 
+            include: { 
+              product: {
+                include: {
+                  pricingTiers: {
+                    orderBy: { minQuantity: 'asc' }
+                  }
+                }
+              }
+            } 
+          } 
+        },
       });
 
       if (!cart || cart.items.length === 0) {
@@ -78,44 +91,40 @@ class OrderService {
           }
         }
 
-        // Calculate Totals
-        let subTotal = 0;
-        cart.items.forEach((item) => {
-          subTotal += parseFloat(item.product.basePrice) * item.quantity;
-        });
+        // Calculate pricing with tiers and rules
+        const hasCustomization = cart.items.some(
+          item => item.customizationDetails && Object.keys(item.customizationDetails).length > 0
+        );
 
-        const shippingRule = await tx.pricingRule.findFirst({
-          where: { name: "Shipping cost", type: "FIXED" },
-        });
-        const shippingCost = shippingRule
-          ? parseFloat(shippingRule.value)
-          : 20.0;
+        const orderPricing = await calculateOrderPricing(cart.items, { hasCustomization });
 
-        const totalAmount = subTotal + shippingCost;
         const orderNumber =
           "ORD-" + crypto.randomBytes(4).toString("hex").toUpperCase();
 
-        // Create Final Order
+        // Create Final Order with calculated prices
         const newOrder = await tx.order.create({
           data: {
             orderNumber,
             userId,
             shippingAddressId: finalAddressId,
-            subTotal,
-            shippingCost,
-            totalAmount,
+            subTotal: orderPricing.subTotal,
+            shippingCost: orderPricing.shippingCost,
+            totalAmount: orderPricing.totalAmount,
             status: "PENDING",
             items: {
-              create: cart.items.map((item) => ({
-                productId: item.productId,
-                quantity: item.quantity,
-                unitPrice: item.product.basePrice,
-                customizationDetails: item.customizationDetails,
-              })),
+              create: cart.items.map((item) => {
+                const pricing = calculateItemPrice(item.product, item.quantity);
+                return {
+                  productId: item.productId,
+                  quantity: item.quantity,
+                  unitPrice: pricing.unitPrice, // Use calculated tiered price
+                  customizationDetails: item.customizationDetails,
+                };
+              }),
             },
             payments: {
               create: {
-                amount: totalAmount,
+                amount: orderPricing.totalAmount,
                 method: paymentMethod,
                 status: "PENDING",
               },
